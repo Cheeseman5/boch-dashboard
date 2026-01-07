@@ -46,6 +46,10 @@ export function Dashboard() {
 
   const fetchWatchData = useCallback(async (watch: Watch): Promise<WatchWithData> => {
     try {
+      if (import.meta.env.DEV) {
+        console.debug('[boch] fetchWatchData for', watch.name);
+      }
+
       const [summary, historyResponse] = await Promise.all([
         getHistorySummary(apiKey, watch.name),
         getHistory(apiKey, watch.name, 90),
