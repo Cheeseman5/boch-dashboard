@@ -132,6 +132,18 @@ export function Dashboard() {
     }
   };
 
+  const handleApiKeyChange = (value: string) => {
+    setApiKey(value);
+    // If cleared, reset all state
+    if (!value.trim()) {
+      setIsConnected(false);
+      setWatches([]);
+      setWatchOrder([]);
+      setError(null);
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+    }
+  };
+
   const handleAddWatch = () => {
     setEditingWatch(undefined);
     setWatchDialogOpen(true);
@@ -336,7 +348,7 @@ export function Dashboard() {
                     <p className="text-sm font-medium">API Key</p>
                     <ApiKeyInput
                       value={apiKey}
-                      onChange={setApiKey}
+                      onChange={handleApiKeyChange}
                       onSubmit={handleConnect}
                       isLoading={isLoading}
                     />
