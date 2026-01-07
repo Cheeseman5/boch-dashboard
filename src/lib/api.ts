@@ -15,11 +15,22 @@ class ApiError extends Error {
   }
 }
 
+function encodePathSegment(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) throw new Error('Missing watch name');
+  return encodeURIComponent(trimmed);
+}
+
 async function apiRequest<T>(
   endpoint: string,
   apiKey: string,
   options: RequestInit = {}
 ): Promise<T> {
+  if (import.meta.env.DEV) {
+    // Never log API keys; endpoint is enough to confirm what watch name is being requested.
+    console.debug('[boch] request', endpoint);
+  }
+
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers: {
@@ -38,7 +49,7 @@ async function apiRequest<T>(
   // Handle empty responses
   const text = await response.text();
   if (!text) return {} as T;
-  
+
   return JSON.parse(text);
 }
 
@@ -58,14 +69,14 @@ export async function updateWatch(
   watchName: string,
   data: UpdateWatchRequest
 ): Promise<void> {
-  await apiRequest(`/api/watch/${encodeURIComponent(watchName)}`, apiKey, {
+  await apiRequest(`/api/watch/${encodePathSegment(watchName)}`, apiKey, {
     method: 'PUT',
     body: JSON.stringify(data),
   });
 }
 
 export async function deleteWatch(apiKey: string, watchName: string): Promise<void> {
-  await apiRequest(`/api/watch/${encodeURIComponent(watchName)}`, apiKey, {
+  await apiRequest(`/api/watch/${encodePathSegment(watchName)}`, apiKey, {
     method: 'DELETE',
   });
 }
@@ -77,7 +88,7 @@ export async function getHistory(
 ): Promise<HistoryResponse> {
   const params = limit ? `?limit=${limit}` : '';
   return apiRequest<HistoryResponse>(
-    `/api/history/${encodeURIComponent(watchName)}${params}`,
+    `/api/history/${encodePathSegment(watchName)}${params}`,
     apiKey
   );
 }
@@ -87,7 +98,7 @@ export async function getHistorySummary(
   watchName: string
 ): Promise<HistorySummaryResponse> {
   return apiRequest<HistorySummaryResponse>(
-    `/api/history/${encodeURIComponent(watchName)}/summary`,
+    `/api/history/${encodePathSegment(watchName)}/summary`,
     apiKey
   );
 }
