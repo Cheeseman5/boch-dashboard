@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { RefreshCw, Plus, Activity, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -193,6 +193,8 @@ export function Dashboard() {
   };
 
   // Drag and drop handlers
+  const dragTimeoutRef = useRef<number | null>(null);
+  
   const handleDragStart = (e: React.DragEvent, watchName: string) => {
     setDraggedWatch(watchName);
     e.dataTransfer.effectAllowed = 'move';
@@ -203,16 +205,33 @@ export function Dashboard() {
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = 'move';
-    if (draggedWatch && targetName !== draggedWatch) {
+    
+    if (draggedWatch && targetName !== draggedWatch && targetName !== dragOverWatch) {
+      // Clear any pending timeout
+      if (dragTimeoutRef.current) {
+        clearTimeout(dragTimeoutRef.current);
+        dragTimeoutRef.current = null;
+      }
       setDragOverWatch(targetName);
     }
   };
 
-  const handleDragLeave = () => {
-    setDragOverWatch(null);
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    // Use a small delay to prevent flickering when moving between cards
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+    }
+    dragTimeoutRef.current = window.setTimeout(() => {
+      // Intentionally empty - we only clear on dragEnd or new dragOver
+    }, 50);
   };
 
   const handleDragEnd = () => {
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+      dragTimeoutRef.current = null;
+    }
     setDraggedWatch(null);
     setDragOverWatch(null);
   };
@@ -221,6 +240,11 @@ export function Dashboard() {
     e.preventDefault();
     e.stopPropagation();
     
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+      dragTimeoutRef.current = null;
+    }
+    
     const draggedName = e.dataTransfer.getData('text/plain') || draggedWatch;
     if (!draggedName || draggedName === targetName) {
       setDraggedWatch(null);
@@ -228,19 +252,18 @@ export function Dashboard() {
       return;
     }
 
-    // Get current order or build from watches
+    // Use the preview order as the new order (what user sees is what they get)
     const currentOrder = watchOrder.length > 0 
-      ? watchOrder 
+      ? [...watchOrder]
       : watches.map(w => w.name);
 
-    const newOrder = [...currentOrder];
-    const draggedIndex = newOrder.indexOf(draggedName);
-    const targetIndex = newOrder.indexOf(targetName);
+    const draggedIndex = currentOrder.indexOf(draggedName);
+    const targetIndex = currentOrder.indexOf(targetName);
     
     if (draggedIndex !== -1 && targetIndex !== -1) {
-      newOrder.splice(draggedIndex, 1);
-      newOrder.splice(targetIndex, 0, draggedName);
-      setWatchOrder(newOrder);
+      currentOrder.splice(draggedIndex, 1);
+      currentOrder.splice(targetIndex, 0, draggedName);
+      setWatchOrder(currentOrder);
     }
 
     setDraggedWatch(null);
@@ -257,19 +280,20 @@ export function Dashboard() {
     return aIndex - bIndex;
   });
 
-  // Create preview order when dragging
+  // Create preview order when dragging - show where card WILL go
   const previewWatches = draggedWatch && dragOverWatch
     ? (() => {
-        const currentOrder = sortedWatches.map(w => w.name);
-        const draggedIndex = currentOrder.indexOf(draggedWatch);
-        const targetIndex = currentOrder.indexOf(dragOverWatch);
+        const names = sortedWatches.map(w => w.name);
+        const draggedIndex = names.indexOf(draggedWatch);
+        const targetIndex = names.indexOf(dragOverWatch);
         if (draggedIndex === -1 || targetIndex === -1) return sortedWatches;
         
-        const newOrder = [...currentOrder];
-        newOrder.splice(draggedIndex, 1);
-        newOrder.splice(targetIndex, 0, draggedWatch);
+        // Remove dragged item and insert at target position
+        const reordered = [...names];
+        reordered.splice(draggedIndex, 1);
+        reordered.splice(targetIndex, 0, draggedWatch);
         
-        return newOrder.map(name => sortedWatches.find(w => w.name === name)!);
+        return reordered.map(name => sortedWatches.find(w => w.name === name)!);
       })()
     : sortedWatches;
 
