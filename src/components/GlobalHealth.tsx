@@ -44,7 +44,7 @@ export function GlobalHealth({ statuses, isLoading }: GlobalHealthProps) {
             <div key={status} className="flex items-center gap-2">
               <Stoplight status={status as StoplightStatus} size="sm" />
               <span className="text-sm text-muted-foreground">
-                {count} {count === 1 ? 'watch' : 'watches'}
+                {count}
               </span>
             </div>
           ))}
