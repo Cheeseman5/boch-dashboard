@@ -183,45 +183,56 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <header className="hero-gradient border-b border-border/50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col items-center gap-6">
+      {/* Nav Bar */}
+      <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
             {/* Logo & Title */}
-            <div className="flex items-center gap-3">
-              <Activity className="w-8 h-8 text-primary" />
-              <h1 className="text-3xl font-bold text-gradient">BOCH Dashboard</h1>
+            <div className="flex items-center gap-2 shrink-0">
+              <Activity className="w-6 h-6 text-primary" />
+              <h1 className="text-xl font-bold text-gradient">BOCH Dashboard</h1>
             </div>
 
             {/* API Key Input */}
-            <ApiKeyInput
-              value={apiKey}
-              onChange={setApiKey}
-              onSubmit={handleConnect}
-              isLoading={isLoading}
-            />
-
-            {/* Global Health */}
-            {isConnected && (
-              <GlobalHealth statuses={statuses} isLoading={isLoading} />
-            )}
-
-            {/* Error Message */}
-            {error && (
-              <div className="bg-destructive/10 border border-destructive/30 rounded-lg px-4 py-2 text-sm text-destructive">
-                {error}
-              </div>
-            )}
-
-            {/* Not Connected Message */}
-            {!isConnected && !error && (
-              <p className="text-muted-foreground text-center max-w-md">
-                Enter your RapidAPI key to begin viewing your watches
-              </p>
-            )}
+            <div className="flex-1 max-w-md">
+              <ApiKeyInput
+                value={apiKey}
+                onChange={setApiKey}
+                onSubmit={handleConnect}
+                isLoading={isLoading}
+              />
+            </div>
           </div>
         </div>
-      </header>
+      </nav>
+
+      {/* Status Section */}
+      {(isConnected || error || !apiKey.trim()) && (
+        <div className="border-b border-border/50 bg-muted/30">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex flex-col items-center gap-4">
+              {/* Global Health */}
+              {isConnected && (
+                <GlobalHealth statuses={statuses} isLoading={isLoading} />
+              )}
+
+              {/* Error Message */}
+              {error && (
+                <div className="bg-destructive/10 border border-destructive/30 rounded-lg px-4 py-2 text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+
+              {/* Not Connected Message */}
+              {!isConnected && !error && (
+                <p className="text-muted-foreground text-center max-w-md">
+                  Enter your RapidAPI key to begin viewing your watches
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
