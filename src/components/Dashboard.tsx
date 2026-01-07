@@ -195,10 +195,12 @@ export function Dashboard() {
   const handleDragStart = (e: React.DragEvent, watchName: string) => {
     setDraggedWatch(watchName);
     e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', watchName);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     e.dataTransfer.dropEffect = 'move';
   };
 
@@ -208,19 +210,28 @@ export function Dashboard() {
 
   const handleDrop = (e: React.DragEvent, targetName: string) => {
     e.preventDefault();
-    if (!draggedWatch || draggedWatch === targetName) return;
+    e.stopPropagation();
+    
+    const draggedName = e.dataTransfer.getData('text/plain') || draggedWatch;
+    if (!draggedName || draggedName === targetName) {
+      setDraggedWatch(null);
+      return;
+    }
 
-    setWatchOrder((prevOrder) => {
-      const newOrder = [...prevOrder];
-      const draggedIndex = newOrder.indexOf(draggedWatch);
-      const targetIndex = newOrder.indexOf(targetName);
-      
-      if (draggedIndex === -1 || targetIndex === -1) return prevOrder;
-      
+    // Get current order or build from watches
+    const currentOrder = watchOrder.length > 0 
+      ? watchOrder 
+      : watches.map(w => w.name);
+
+    const newOrder = [...currentOrder];
+    const draggedIndex = newOrder.indexOf(draggedName);
+    const targetIndex = newOrder.indexOf(targetName);
+    
+    if (draggedIndex !== -1 && targetIndex !== -1) {
       newOrder.splice(draggedIndex, 1);
-      newOrder.splice(targetIndex, 0, draggedWatch);
-      return newOrder;
-    });
+      newOrder.splice(targetIndex, 0, draggedName);
+      setWatchOrder(newOrder);
+    }
 
     setDraggedWatch(null);
   };

@@ -1,4 +1,4 @@
-import { Pencil, Pause, Play, Trash2, GripVertical } from 'lucide-react';
+import { Pencil, Pause, Play, Trash2, GripHorizontal } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -40,7 +40,7 @@ export function WatchCard({
   return (
     <Card 
       className={cn(
-        'glass-card transition-all duration-300 animate-fade-in',
+        'glass-card transition-all duration-300 animate-fade-in relative',
         isLoading && 'card-loading',
         isDragging && 'opacity-50 scale-[0.98]'
       )}
@@ -50,11 +50,13 @@ export function WatchCard({
       onDragEnd={onDragEnd}
       onDrop={onDrop}
     >
-      <CardHeader className="flex flex-row items-start justify-between gap-4 pb-2">
+      {/* Drag Handle - centered at top */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors py-1 px-4">
+        <GripHorizontal className="w-5 h-5" />
+      </div>
+
+      <CardHeader className="flex flex-row items-start justify-between gap-4 pb-2 pt-6">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors">
-            <GripVertical className="w-5 h-5" />
-          </div>
           <Stoplight status={status} animate={!isLoading && status !== 'grey'} />
           <div className="min-w-0">
             <h3 className="font-semibold truncate">{name}</h3>
