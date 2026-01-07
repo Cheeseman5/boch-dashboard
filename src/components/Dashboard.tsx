@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
-import { RefreshCw, Plus, Activity } from 'lucide-react';
+import { RefreshCw, Plus, Activity, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ApiKeyInput } from './ApiKeyInput';
 import { GlobalHealth } from './GlobalHealth';
 import { WatchCard } from './WatchCard';
@@ -193,15 +194,25 @@ export function Dashboard() {
               <h1 className="text-xl font-bold text-gradient">BOCH Dashboard</h1>
             </div>
 
-            {/* API Key Input */}
-            <div className="flex-1 max-w-md">
-              <ApiKeyInput
-                value={apiKey}
-                onChange={setApiKey}
-                onSubmit={handleConnect}
-                isLoading={isLoading}
-              />
-            </div>
+            {/* API Key Menu */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="shrink-0">
+                  <Settings className="w-5 h-5" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-80">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">API Key</p>
+                  <ApiKeyInput
+                    value={apiKey}
+                    onChange={setApiKey}
+                    onSubmit={handleConnect}
+                    isLoading={isLoading}
+                  />
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </nav>
