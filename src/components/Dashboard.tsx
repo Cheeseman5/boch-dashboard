@@ -245,25 +245,25 @@ export function Dashboard() {
       dragTimeoutRef.current = null;
     }
     
-    const draggedName = e.dataTransfer.getData('text/plain') || draggedWatch;
+    // Get dragged name from dataTransfer (more reliable than state which may be cleared by dragEnd)
+    const draggedName = e.dataTransfer.getData('text/plain');
     if (!draggedName || draggedName === targetName) {
       setDraggedWatch(null);
       setDragOverWatch(null);
       return;
     }
 
-    // Use the preview order as the new order (what user sees is what they get)
-    const currentOrder = watchOrder.length > 0 
-      ? [...watchOrder]
-      : watches.map(w => w.name);
+    // Build the new order - use current preview order which shows what user expects
+    const currentNames = watches.map(w => w.name);
+    const baseOrder = watchOrder.length > 0 ? [...watchOrder] : currentNames;
 
-    const draggedIndex = currentOrder.indexOf(draggedName);
-    const targetIndex = currentOrder.indexOf(targetName);
+    const draggedIndex = baseOrder.indexOf(draggedName);
+    const targetIndex = baseOrder.indexOf(targetName);
     
     if (draggedIndex !== -1 && targetIndex !== -1) {
-      currentOrder.splice(draggedIndex, 1);
-      currentOrder.splice(targetIndex, 0, draggedName);
-      setWatchOrder(currentOrder);
+      baseOrder.splice(draggedIndex, 1);
+      baseOrder.splice(targetIndex, 0, draggedName);
+      setWatchOrder(baseOrder);
     }
 
     setDraggedWatch(null);
