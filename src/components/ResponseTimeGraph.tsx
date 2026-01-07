@@ -44,13 +44,13 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
 export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps) {
   if (isLoading) {
     return (
-      <div className="h-32 w-full skeleton-pulse" />
+      <div className="h-full w-full min-h-[160px] skeleton-pulse" />
     );
   }
 
   if (!history || history.length === 0) {
     return (
-      <div className="h-32 w-full flex items-center justify-center text-sm text-muted-foreground bg-muted/30 rounded-lg">
+      <div className="h-full w-full min-h-[160px] flex items-center justify-center text-sm text-muted-foreground bg-muted/30 rounded-lg">
         No history data available
       </div>
     );
@@ -67,7 +67,7 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
     }));
 
   return (
-    <div className="h-32 w-full">
+    <div className="h-full w-full min-h-[160px]">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
           <defs>

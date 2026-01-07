@@ -272,7 +272,7 @@ export function Dashboard() {
         )}
 
         {isConnected && watches.length > 0 && (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-col gap-6">
             {watches.map((watch) => (
               <WatchCard
                 key={watch.name}
