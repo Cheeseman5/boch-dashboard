@@ -1,4 +1,4 @@
-import { Pencil, Pause, Play, Trash2 } from 'lucide-react';
+import { Pencil, Pause, Play, Trash2, GripVertical } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,9 +12,24 @@ interface WatchCardProps {
   onEdit: () => void;
   onToggle: () => void;
   onDelete: () => void;
+  isDragging?: boolean;
+  onDragStart?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDragEnd?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
 }
 
-export function WatchCard({ watch, onEdit, onToggle, onDelete }: WatchCardProps) {
+export function WatchCard({ 
+  watch, 
+  onEdit, 
+  onToggle, 
+  onDelete,
+  isDragging,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
+  onDrop,
+}: WatchCardProps) {
   const { name, url, intervalMinutes, active, summary, history, status, isLoading } = watch;
 
   const formatMs = (ms?: number) => {
@@ -23,12 +38,23 @@ export function WatchCard({ watch, onEdit, onToggle, onDelete }: WatchCardProps)
   };
 
   return (
-    <Card className={cn(
-      'glass-card transition-all duration-300 animate-fade-in',
-      isLoading && 'card-loading'
-    )}>
+    <Card 
+      className={cn(
+        'glass-card transition-all duration-300 animate-fade-in',
+        isLoading && 'card-loading',
+        isDragging && 'opacity-50 scale-[0.98]'
+      )}
+      draggable
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragEnd={onDragEnd}
+      onDrop={onDrop}
+    >
       <CardHeader className="flex flex-row items-start justify-between gap-4 pb-2">
         <div className="flex items-center gap-3 min-w-0">
+          <div className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors">
+            <GripVertical className="w-5 h-5" />
+          </div>
           <Stoplight status={status} animate={!isLoading && status !== 'grey'} />
           <div className="min-w-0">
             <h3 className="font-semibold truncate">{name}</h3>
