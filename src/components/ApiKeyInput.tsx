@@ -24,8 +24,8 @@ export function ApiKeyInput({ value, onChange, onSubmit, isLoading }: ApiKeyInpu
   };
 
   return (
-    <div className="flex items-center gap-3 w-full">
-      <div className="relative flex-1">
+    <div className="flex flex-col gap-3 w-full">
+      <div className="relative">
         <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           type={showKey ? 'text' : 'password'}
@@ -46,7 +46,7 @@ export function ApiKeyInput({ value, onChange, onSubmit, isLoading }: ApiKeyInpu
       <Button 
         onClick={onSubmit} 
         disabled={!value.trim() || isLoading}
-        className="shrink-0"
+        className="w-full"
       >
         {isLoading ? 'Loading...' : 'Connect'}
       </Button>
