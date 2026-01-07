@@ -52,7 +52,7 @@ export function Dashboard() {
 
       const [summary, historyResponse] = await Promise.all([
         getHistorySummary(apiKey, watch.name),
-        getHistory(apiKey, watch.name, 90),
+        getHistory(apiKey, watch.name),
       ]);
 
       const status = calculateWatchStatus(summary, historyResponse.records);
