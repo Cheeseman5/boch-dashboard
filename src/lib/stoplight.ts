@@ -33,8 +33,8 @@ export function calculateWatchStatus(
   const responseTimes = history?.map((h) => h.responseTimeMs) || [];
   const p95 = responseTimes.length > 0 ? calculateP95(responseTimes) : summary.responseTime.avg;
 
-  // Check for failed responses (4xx, 5xx, or 0)
-  if (hasFailedResponses(summary.statusSummary)) {
+  // Check for failed responses (4xx, 5xx, or 0) or extreme latency
+  if (hasFailedResponses(summary.statusSummary) || p95 >= 2000) {
     return 'red';
   }
 
