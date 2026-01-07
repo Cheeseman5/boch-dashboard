@@ -233,57 +233,53 @@ export function Dashboard() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Actions Bar - always show when connected */}
         {isConnected && (
-          <>
-            {/* Actions Bar */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">
-                Your Watches ({watches.length})
-              </h2>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={refreshData}
-                  disabled={isLoading}
-                >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
-                <Button size="sm" onClick={handleAddWatch}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Watch
-                </Button>
-              </div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold">
+              Your Watches ({watches.length})
+            </h2>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshData}
+                disabled={isLoading}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button size="sm" onClick={handleAddWatch}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Watch
+              </Button>
             </div>
+          </div>
+        )}
 
-            {/* Watch Grid */}
-            {watches.length === 0 ? (
-              <div className="text-center py-16">
-                <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No watches added</h3>
-                <p className="text-muted-foreground mb-4">
-                  Create your first watch to start monitoring your endpoints
-                </p>
-                <Button onClick={handleAddWatch}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Watch
-                </Button>
-              </div>
-            ) : (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {watches.map((watch) => (
-                  <WatchCard
-                    key={watch.name}
-                    watch={watch}
-                    onEdit={() => handleEditWatch(watch)}
-                    onToggle={() => handleToggleWatch(watch)}
-                    onDelete={() => handleDeleteClick(watch.name)}
-                  />
-                ))}
-              </div>
-            )}
-          </>
+        {/* Watch Grid */}
+        {isConnected && watches.length === 0 && !isLoading && (
+          <div className="text-center py-16">
+            <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">No watches added</h3>
+            <p className="text-muted-foreground mb-4">
+              Create your first watch to start monitoring your endpoints
+            </p>
+          </div>
+        )}
+
+        {isConnected && watches.length > 0 && (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {watches.map((watch) => (
+              <WatchCard
+                key={watch.name}
+                watch={watch}
+                onEdit={() => handleEditWatch(watch)}
+                onToggle={() => handleToggleWatch(watch)}
+                onDelete={() => handleDeleteClick(watch.name)}
+              />
+            ))}
+          </div>
         )}
       </main>
 
