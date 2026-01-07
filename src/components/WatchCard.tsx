@@ -48,30 +48,34 @@ export function WatchCard({ watch, onEdit, onToggle, onDelete }: WatchCardProps)
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Response Time Stats */}
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <p className="text-xs text-muted-foreground">Min</p>
-            <p className="text-lg font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.min)}
-            </p>
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Response Time Stats - compact sidebar */}
+          <div className="flex lg:flex-col gap-4 lg:gap-2 lg:w-24 shrink-0">
+            <div className="text-center lg:text-left">
+              <p className="text-xs text-muted-foreground">Min</p>
+              <p className="text-lg font-mono font-medium">
+                {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.min)}
+              </p>
+            </div>
+            <div className="text-center lg:text-left">
+              <p className="text-xs text-muted-foreground">Avg</p>
+              <p className="text-lg font-mono font-medium">
+                {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.avg)}
+              </p>
+            </div>
+            <div className="text-center lg:text-left">
+              <p className="text-xs text-muted-foreground">Max</p>
+              <p className="text-lg font-mono font-medium">
+                {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.max)}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Avg</p>
-            <p className="text-lg font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.avg)}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Max</p>
-            <p className="text-lg font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.max)}
-            </p>
+
+          {/* Response Time Graph - takes up remaining space */}
+          <div className="flex-1 min-h-[160px]">
+            <ResponseTimeGraph history={history || []} isLoading={isLoading} />
           </div>
         </div>
-
-        {/* Response Time Graph */}
-        <ResponseTimeGraph history={history || []} isLoading={isLoading} />
 
         {/* Actions */}
         <div className="flex items-center justify-between pt-2 border-t border-border/50">
