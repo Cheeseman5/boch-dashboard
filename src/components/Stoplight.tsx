@@ -25,7 +25,7 @@ export function Stoplight({ status, size = 'md', className, animate = false }: S
           'stoplight-yellow': status === 'yellow',
           'stoplight-red': status === 'red',
           'stoplight-grey': status === 'grey',
-          'animate-pulse-glow': animate && status !== 'grey',
+          'animate-pulse-glow': animate && (status === 'red' || status === 'yellow'),
         },
         className
       )}
