@@ -24,7 +24,7 @@ export function ApiKeyInput({ value, onChange, onSubmit, isLoading }: ApiKeyInpu
   };
 
   return (
-    <div className="flex items-center gap-3 w-full max-w-lg">
+    <div className="flex items-center gap-3 w-full">
       <div className="relative flex-1">
         <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
@@ -50,11 +50,6 @@ export function ApiKeyInput({ value, onChange, onSubmit, isLoading }: ApiKeyInpu
       >
         {isLoading ? 'Loading...' : 'Connect'}
       </Button>
-      {value.length > 5 && (
-        <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
-          ...{value.slice(-5)}
-        </span>
-      )}
     </div>
   );
 }

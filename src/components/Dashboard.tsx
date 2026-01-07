@@ -195,24 +195,31 @@ export function Dashboard() {
             </div>
 
             {/* API Key Menu */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="shrink-0">
-                  <Settings className="w-5 h-5" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-80">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">API Key</p>
-                  <ApiKeyInput
-                    value={apiKey}
-                    onChange={setApiKey}
-                    onSubmit={handleConnect}
-                    isLoading={isLoading}
-                  />
-                </div>
-              </PopoverContent>
-            </Popover>
+            <div className="flex items-center gap-3">
+              {apiKey && (
+                <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
+                  Key: ...{apiKey.slice(-5)}
+                </span>
+              )}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="shrink-0">
+                    <Settings className="w-5 h-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-[28rem]">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">API Key</p>
+                    <ApiKeyInput
+                      value={apiKey}
+                      onChange={setApiKey}
+                      onSubmit={handleConnect}
+                      isLoading={isLoading}
+                    />
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
         </div>
       </nav>
