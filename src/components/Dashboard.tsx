@@ -35,6 +35,7 @@ export function Dashboard() {
   const [watches, setWatches] = useState<WatchWithData[]>([]);
   const [watchOrder, setWatchOrder] = useState<string[]>([]);
   const [draggedWatch, setDraggedWatch] = useState<string | null>(null);
+  const [dragOverWatch, setDragOverWatch] = useState<string | null>(null);
 
   // Dialog states
   const [watchDialogOpen, setWatchDialogOpen] = useState(false);
@@ -198,14 +199,22 @@ export function Dashboard() {
     e.dataTransfer.setData('text/plain', watchName);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent, targetName: string) => {
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = 'move';
+    if (draggedWatch && targetName !== draggedWatch) {
+      setDragOverWatch(targetName);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverWatch(null);
   };
 
   const handleDragEnd = () => {
     setDraggedWatch(null);
+    setDragOverWatch(null);
   };
 
   const handleDrop = (e: React.DragEvent, targetName: string) => {
@@ -215,6 +224,7 @@ export function Dashboard() {
     const draggedName = e.dataTransfer.getData('text/plain') || draggedWatch;
     if (!draggedName || draggedName === targetName) {
       setDraggedWatch(null);
+      setDragOverWatch(null);
       return;
     }
 
@@ -234,6 +244,7 @@ export function Dashboard() {
     }
 
     setDraggedWatch(null);
+    setDragOverWatch(null);
   };
 
   // Sort watches by custom order
@@ -245,6 +256,22 @@ export function Dashboard() {
     if (bIndex === -1) return -1;
     return aIndex - bIndex;
   });
+
+  // Create preview order when dragging
+  const previewWatches = draggedWatch && dragOverWatch
+    ? (() => {
+        const currentOrder = sortedWatches.map(w => w.name);
+        const draggedIndex = currentOrder.indexOf(draggedWatch);
+        const targetIndex = currentOrder.indexOf(dragOverWatch);
+        if (draggedIndex === -1 || targetIndex === -1) return sortedWatches;
+        
+        const newOrder = [...currentOrder];
+        newOrder.splice(draggedIndex, 1);
+        newOrder.splice(targetIndex, 0, draggedWatch);
+        
+        return newOrder.map(name => sortedWatches.find(w => w.name === name)!);
+      })()
+    : sortedWatches;
 
   const statuses = watches.map((w) => w.status);
 
@@ -355,9 +382,9 @@ export function Dashboard() {
           </div>
         )}
 
-        {isConnected && sortedWatches.length > 0 && (
+        {isConnected && previewWatches.length > 0 && (
           <div className="flex flex-col gap-6">
-            {sortedWatches.map((watch) => (
+            {previewWatches.map((watch) => (
               <WatchCard
                 key={watch.name}
                 watch={watch}
@@ -365,8 +392,10 @@ export function Dashboard() {
                 onToggle={() => handleToggleWatch(watch)}
                 onDelete={() => handleDeleteClick(watch.name)}
                 isDragging={draggedWatch === watch.name}
+                isGhost={draggedWatch !== null && dragOverWatch !== null && watch.name === draggedWatch}
                 onDragStart={(e) => handleDragStart(e, watch.name)}
-                onDragOver={handleDragOver}
+                onDragOver={(e) => handleDragOver(e, watch.name)}
+                onDragLeave={handleDragLeave}
                 onDragEnd={handleDragEnd}
                 onDrop={(e) => handleDrop(e, watch.name)}
               />
