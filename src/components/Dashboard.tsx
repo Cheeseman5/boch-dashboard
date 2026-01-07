@@ -219,6 +219,14 @@ export function Dashboard() {
                 Enter your RapidAPI key to begin viewing your watches
               </p>
             )}
+
+            {/* Add Watch in Header when connected but no watches */}
+            {isConnected && watches.length === 0 && !isLoading && (
+              <Button size="lg" onClick={handleAddWatch} className="mt-2">
+                <Plus className="w-5 h-5 mr-2" />
+                Add Your First Watch
+              </Button>
+            )}
           </div>
         </div>
       </header>
