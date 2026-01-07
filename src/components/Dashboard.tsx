@@ -219,25 +219,14 @@ export function Dashboard() {
                 Enter your RapidAPI key to begin viewing your watches
               </p>
             )}
-
-            {/* Add Watch - always visible (disabled until API key exists) */}
-            <Button
-              size="lg"
-              onClick={handleAddWatch}
-              className="mt-2"
-              disabled={!apiKey.trim()}
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Watch
-            </Button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Actions Bar - always show when connected */}
-        {isConnected && (
+        {/* Actions Bar - always show when API key exists */}
+        {apiKey.trim() && (
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">
               Your Watches ({watches.length})
@@ -247,7 +236,7 @@ export function Dashboard() {
                 variant="outline"
                 size="sm"
                 onClick={refreshData}
-                disabled={isLoading}
+                disabled={isLoading || !isConnected}
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 Refresh
