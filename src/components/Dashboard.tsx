@@ -207,7 +207,7 @@ export function Dashboard() {
                     <Settings className="w-5 h-5" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent align="end" className="w-[28rem]">
+                <PopoverContent align="end" className="w-[34rem]">
                   <div className="space-y-2">
                     <p className="text-sm font-medium">API Key</p>
                     <ApiKeyInput
