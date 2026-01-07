@@ -198,6 +198,8 @@ export function Dashboard() {
   const handleDragStart = (e: React.DragEvent, watchName: string) => {
     setDraggedWatch(watchName);
     e.dataTransfer.effectAllowed = 'move';
+    // Store under a custom type first to avoid the browser overriding text/plain
+    e.dataTransfer.setData('application/x-boch-watch-name', watchName);
     e.dataTransfer.setData('text/plain', watchName);
   };
 
@@ -244,22 +246,27 @@ export function Dashboard() {
       clearTimeout(dragTimeoutRef.current);
       dragTimeoutRef.current = null;
     }
-    
+
+    // Use the last "over" card as the target when available (more stable than relying on the exact drop node)
+    const effectiveTarget = dragOverWatch ?? targetName;
+
     // Get dragged name from dataTransfer (more reliable than state which may be cleared by dragEnd)
-    const draggedName = e.dataTransfer.getData('text/plain');
-    if (!draggedName || draggedName === targetName) {
+    const draggedName =
+      e.dataTransfer.getData('application/x-boch-watch-name') ||
+      e.dataTransfer.getData('text/plain');
+
+    if (!draggedName || draggedName === effectiveTarget) {
       setDraggedWatch(null);
       setDragOverWatch(null);
       return;
     }
 
-    // Build the new order - use current preview order which shows what user expects
-    const currentNames = watches.map(w => w.name);
+    const currentNames = watches.map((w) => w.name);
     const baseOrder = watchOrder.length > 0 ? [...watchOrder] : currentNames;
 
     const draggedIndex = baseOrder.indexOf(draggedName);
-    const targetIndex = baseOrder.indexOf(targetName);
-    
+    const targetIndex = baseOrder.indexOf(effectiveTarget);
+
     if (draggedIndex !== -1 && targetIndex !== -1) {
       baseOrder.splice(draggedIndex, 1);
       baseOrder.splice(targetIndex, 0, draggedName);

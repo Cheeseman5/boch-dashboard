@@ -49,15 +49,17 @@ export function WatchCard({
         isDragging && 'opacity-50 scale-[0.98]',
         isGhost && 'ring-2 ring-primary/50 ring-dashed'
       )}
-      draggable
-      onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDragEnd={onDragEnd}
       onDrop={onDrop}
     >
-      {/* Drag Handle - centered at top */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors py-1 px-4">
+      {/* Drag Handle - centered at top (only draggable area) */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors py-1 px-4"
+        draggable
+        onDragStart={onDragStart}
+      >
         <GripHorizontal className="w-5 h-5" />
       </div>
 
