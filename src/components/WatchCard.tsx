@@ -13,8 +13,10 @@ interface WatchCardProps {
   onToggle: () => void;
   onDelete: () => void;
   isDragging?: boolean;
+  isGhost?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onDragOver?: (e: React.DragEvent) => void;
+  onDragLeave?: (e: React.DragEvent) => void;
   onDragEnd?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
 }
@@ -25,8 +27,10 @@ export function WatchCard({
   onToggle, 
   onDelete,
   isDragging,
+  isGhost,
   onDragStart,
   onDragOver,
+  onDragLeave,
   onDragEnd,
   onDrop,
 }: WatchCardProps) {
@@ -42,11 +46,13 @@ export function WatchCard({
       className={cn(
         'glass-card transition-all duration-300 animate-fade-in relative',
         isLoading && 'card-loading',
-        isDragging && 'opacity-50 scale-[0.98]'
+        isDragging && 'opacity-50 scale-[0.98]',
+        isGhost && 'ring-2 ring-primary/50 ring-dashed'
       )}
       draggable
       onDragStart={onDragStart}
       onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
       onDragEnd={onDragEnd}
       onDrop={onDrop}
     >
