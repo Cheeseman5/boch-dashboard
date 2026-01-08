@@ -181,9 +181,9 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
       <div className="flex-1 min-h-0 flex">
         {/* Y-axis labels on left */}
         <div className="flex flex-col justify-between items-end pr-1 py-1 shrink-0">
-          <span className="text-[9px] text-muted-foreground leading-none">{maxResponse}ms</span>
+          <span className="text-[9px] text-muted-foreground leading-none">{maxResponse.toLocaleString()}</span>
           <span className="text-[8px] text-muted-foreground leading-none">ms</span>
-          <span className="text-[9px] text-muted-foreground leading-none">{minResponse}ms</span>
+          <span className="text-[9px] text-muted-foreground leading-none">{minResponse.toLocaleString()}</span>
         </div>
         
         {/* Chart area */}
