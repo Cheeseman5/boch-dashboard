@@ -293,15 +293,17 @@ export function Dashboard() {
     setDragOverWatch(null);
   };
 
-  // Sort watches by custom order
-  const sortedWatches = [...watches].sort((a, b) => {
-    const aIndex = watchOrder.indexOf(a.name);
-    const bIndex = watchOrder.indexOf(b.name);
-    if (aIndex === -1 && bIndex === -1) return 0;
-    if (aIndex === -1) return 1;
-    if (bIndex === -1) return -1;
-    return aIndex - bIndex;
-  });
+  // Filter out inactive watches and sort by custom order
+  const sortedWatches = [...watches]
+    .filter((w) => w.active)
+    .sort((a, b) => {
+      const aIndex = watchOrder.indexOf(a.name);
+      const bIndex = watchOrder.indexOf(b.name);
+      if (aIndex === -1 && bIndex === -1) return 0;
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    });
 
   // Create preview order when dragging - show where card WILL go
   const previewWatches = draggedWatch && dragOverWatch
