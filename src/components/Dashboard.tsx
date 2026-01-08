@@ -193,14 +193,14 @@ export function Dashboard() {
 
     setIsDeleting(true);
     try {
-      await deleteWatch(apiKey, deletingWatch);
+      await updateWatch(apiKey, deletingWatch, { active: false });
       setDeleteDialogOpen(false);
       setDeletingWatch(null);
       await refreshData();
     } catch (err) {
       toast({
         title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to delete watch',
+        description: err instanceof Error ? err.message : 'Failed to deactivate watch',
         variant: 'destructive',
       });
     } finally {
