@@ -144,7 +144,7 @@ export function WatchCard({
               </DropdownMenuContent>
             </DropdownMenu>
             <span className="text-xs text-muted-foreground">
-              / {isLoading ? '...' : metrics.count} records
+              / {isLoading ? '...' : (summary?.histroyRecordCount ?? '-')} records
             </span>
           </div>
           <Badge variant={active ? 'default' : 'secondary'} className="text-xs">
