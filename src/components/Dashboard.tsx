@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { RefreshCw, Plus, Activity, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ApiKeyInput } from './ApiKeyInput';
 import { GlobalHealth } from './GlobalHealth';
@@ -34,6 +36,7 @@ export function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [watches, setWatches] = useState<WatchWithData[]>([]);
   const [watchOrder, setWatchOrder] = useState<string[]>([]);
+  const [showInactive, setShowInactive] = useState(false);
   const [draggedWatch, setDraggedWatch] = useState<string | null>(null);
   const [dragOverWatch, setDragOverWatch] = useState<string | null>(null);
 
@@ -293,9 +296,9 @@ export function Dashboard() {
     setDragOverWatch(null);
   };
 
-  // Filter out inactive watches and sort by custom order
+  // Filter and sort watches by custom order
   const sortedWatches = [...watches]
-    .filter((w) => w.active)
+    .filter((w) => showInactive || w.active)
     .sort((a, b) => {
       const aIndex = watchOrder.indexOf(a.name);
       const bIndex = watchOrder.indexOf(b.name);
@@ -304,6 +307,9 @@ export function Dashboard() {
       if (bIndex === -1) return -1;
       return aIndex - bIndex;
     });
+
+  const activeCount = watches.filter((w) => w.active).length;
+  const inactiveCount = watches.filter((w) => !w.active).length;
 
   // Create preview order when dragging - show where card WILL go
   const previewWatches = draggedWatch && dragOverWatch
@@ -399,9 +405,23 @@ export function Dashboard() {
         {/* Actions Bar - always show when API key exists */}
         {apiKey.trim() && (
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">
-              Your Watches ({watches.length})
-            </h2>
+            <div className="flex items-center gap-4">
+              <h2 className="text-xl font-semibold">
+                Your Watches ({activeCount}{inactiveCount > 0 && showInactive ? ` + ${inactiveCount} inactive` : ''})
+              </h2>
+              {inactiveCount > 0 && (
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="show-inactive"
+                    checked={showInactive}
+                    onCheckedChange={setShowInactive}
+                  />
+                  <Label htmlFor="show-inactive" className="text-sm text-muted-foreground cursor-pointer">
+                    Show inactive ({inactiveCount})
+                  </Label>
+                </div>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
