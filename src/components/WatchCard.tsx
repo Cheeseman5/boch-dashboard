@@ -80,8 +80,8 @@ export function WatchCard({
   })();
 
   const formatMs = (ms?: number) => {
-    if (ms === undefined || ms === null) return '-';
-    return `${Math.round(ms).toLocaleString()} ms`;
+    if (ms === undefined || ms === null) return { value: '-', unit: '' };
+    return { value: Math.round(ms).toLocaleString(), unit: 'ms' };
   };
 
   return (
@@ -172,20 +172,26 @@ export function WatchCard({
           <div className="flex flex-col justify-center gap-0.5 min-w-[70px]">
             <div>
               <p className="text-[10px] text-muted-foreground leading-tight">Min</p>
-              <p className="text-sm font-mono font-medium leading-tight">
-                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : formatMs(metrics.min)}
+              <p className="text-sm font-mono font-medium leading-tight flex justify-between">
+                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : (
+                  <><span>{formatMs(metrics.min).value}</span><span className="text-muted-foreground ml-1">{formatMs(metrics.min).unit}</span></>
+                )}
               </p>
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground leading-tight">Avg</p>
-              <p className="text-sm font-mono font-medium leading-tight">
-                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : formatMs(metrics.avg)}
+              <p className="text-sm font-mono font-medium leading-tight flex justify-between">
+                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : (
+                  <><span>{formatMs(metrics.avg).value}</span><span className="text-muted-foreground ml-1">{formatMs(metrics.avg).unit}</span></>
+                )}
               </p>
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground leading-tight">Max</p>
-              <p className="text-sm font-mono font-medium leading-tight">
-                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : formatMs(metrics.max)}
+              <p className="text-sm font-mono font-medium leading-tight flex justify-between">
+                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : (
+                  <><span>{formatMs(metrics.max).value}</span><span className="text-muted-foreground ml-1">{formatMs(metrics.max).unit}</span></>
+                )}
               </p>
             </div>
           </div>
