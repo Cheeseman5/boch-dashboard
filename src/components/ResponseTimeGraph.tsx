@@ -98,6 +98,76 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
   const firstDate = chartData[0]?.startDateTime;
   const lastDate = chartData[chartData.length - 1]?.endDateTime;
 
+  // Threshold values for color changes
+  const YELLOW_THRESHOLD = 500;
+  const RED_THRESHOLD = 2000;
+
+  // Calculate gradient stops based on thresholds
+  // Y-axis goes from top (max) to bottom (min), so we need to invert the percentages
+  const range = maxResponse - minResponse;
+  const getStopOffset = (value: number) => {
+    if (range === 0) return 0;
+    // Invert: high values at top (0%), low values at bottom (100%)
+    return Math.max(0, Math.min(1, 1 - (value - minResponse) / range));
+  };
+
+  // Build gradient stops
+  const gradientStops: { offset: string; color: string }[] = [];
+  
+  // Determine which thresholds are within our data range
+  const yellowInRange = YELLOW_THRESHOLD > minResponse && YELLOW_THRESHOLD < maxResponse;
+  const redInRange = RED_THRESHOLD > minResponse && RED_THRESHOLD < maxResponse;
+
+  if (maxResponse < YELLOW_THRESHOLD) {
+    // All green
+    gradientStops.push({ offset: '0%', color: 'hsl(var(--stoplight-green))' });
+    gradientStops.push({ offset: '100%', color: 'hsl(var(--stoplight-green))' });
+  } else if (minResponse >= RED_THRESHOLD) {
+    // All red
+    gradientStops.push({ offset: '0%', color: 'hsl(var(--stoplight-red))' });
+    gradientStops.push({ offset: '100%', color: 'hsl(var(--stoplight-red))' });
+  } else if (minResponse >= YELLOW_THRESHOLD) {
+    // Between yellow and red
+    if (redInRange) {
+      const redOffset = getStopOffset(RED_THRESHOLD);
+      gradientStops.push({ offset: '0%', color: 'hsl(var(--stoplight-red))' });
+      gradientStops.push({ offset: `${redOffset * 100}%`, color: 'hsl(var(--stoplight-red))' });
+      gradientStops.push({ offset: `${redOffset * 100}%`, color: 'hsl(var(--stoplight-yellow))' });
+      gradientStops.push({ offset: '100%', color: 'hsl(var(--stoplight-yellow))' });
+    } else {
+      gradientStops.push({ offset: '0%', color: 'hsl(var(--stoplight-yellow))' });
+      gradientStops.push({ offset: '100%', color: 'hsl(var(--stoplight-yellow))' });
+    }
+  } else {
+    // Starts in green
+    const yellowOffset = getStopOffset(YELLOW_THRESHOLD);
+    
+    if (redInRange) {
+      const redOffset = getStopOffset(RED_THRESHOLD);
+      gradientStops.push({ offset: '0%', color: 'hsl(var(--stoplight-red))' });
+      gradientStops.push({ offset: `${redOffset * 100}%`, color: 'hsl(var(--stoplight-red))' });
+      gradientStops.push({ offset: `${redOffset * 100}%`, color: 'hsl(var(--stoplight-yellow))' });
+      gradientStops.push({ offset: `${yellowOffset * 100}%`, color: 'hsl(var(--stoplight-yellow))' });
+      gradientStops.push({ offset: `${yellowOffset * 100}%`, color: 'hsl(var(--stoplight-green))' });
+      gradientStops.push({ offset: '100%', color: 'hsl(var(--stoplight-green))' });
+    } else if (yellowInRange) {
+      gradientStops.push({ offset: '0%', color: 'hsl(var(--stoplight-yellow))' });
+      gradientStops.push({ offset: `${yellowOffset * 100}%`, color: 'hsl(var(--stoplight-yellow))' });
+      gradientStops.push({ offset: `${yellowOffset * 100}%`, color: 'hsl(var(--stoplight-green))' });
+      gradientStops.push({ offset: '100%', color: 'hsl(var(--stoplight-green))' });
+    } else {
+      gradientStops.push({ offset: '0%', color: 'hsl(var(--stoplight-green))' });
+      gradientStops.push({ offset: '100%', color: 'hsl(var(--stoplight-green))' });
+    }
+  }
+
+  // Determine the dominant color for the stroke (based on max value)
+  const getStrokeColor = () => {
+    if (maxResponse >= RED_THRESHOLD) return 'url(#strokeGradient)';
+    if (maxResponse >= YELLOW_THRESHOLD) return 'url(#strokeGradient)';
+    return 'hsl(var(--stoplight-green))';
+  };
+
   return (
     <div className="h-full w-full min-h-[100px] flex flex-col overflow-hidden">
       <div className="flex-1 min-h-0 flex">
@@ -113,9 +183,15 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
               <defs>
-                <linearGradient id="colorResponse" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--graph-line))" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(var(--graph-line))" stopOpacity={0} />
+                <linearGradient id="strokeGradient" x1="0" y1="0" x2="0" y2="1">
+                  {gradientStops.map((stop, i) => (
+                    <stop key={i} offset={stop.offset} stopColor={stop.color} />
+                  ))}
+                </linearGradient>
+                <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
+                  {gradientStops.map((stop, i) => (
+                    <stop key={i} offset={stop.offset} stopColor={stop.color} stopOpacity={i === 0 ? 0.3 : 0} />
+                  ))}
                 </linearGradient>
               </defs>
               <XAxis 
@@ -126,7 +202,7 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
               />
               <YAxis 
                 hide 
-                domain={['auto', 'auto']}
+                domain={[minResponse, maxResponse]}
                 axisLine={false}
                 tickLine={false}
               />
@@ -134,9 +210,9 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
               <Area
                 type="monotone"
                 dataKey="responseTimeMs"
-                stroke="hsl(var(--graph-line))"
+                stroke={getStrokeColor()}
                 strokeWidth={2}
-                fill="url(#colorResponse)"
+                fill="url(#fillGradient)"
                 dot={false}
                 activeDot={{ r: 4, fill: 'hsl(var(--graph-line))' }}
               />
