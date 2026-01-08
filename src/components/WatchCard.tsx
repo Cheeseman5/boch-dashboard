@@ -69,17 +69,26 @@ export function WatchCard({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <Badge variant={active ? 'default' : 'secondary'} className="text-xs">
             {active ? 'Active' : 'Inactive'}
           </Badge>
           <Badge variant="outline" className="text-xs">
             {intervalMinutes}m
           </Badge>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8"
+            onClick={onEdit}
+            title="Edit watch"
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent>
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Response Time Stats - compact sidebar */}
           <div className="flex lg:flex-col gap-4 lg:gap-2 lg:w-24 shrink-0">
@@ -101,28 +110,18 @@ export function WatchCard({
                 {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.max)}
               </p>
             </div>
+            <div className="text-center lg:text-left">
+              <p className="text-xs text-muted-foreground">Records</p>
+              <p className="text-lg font-mono font-medium">
+                {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : (summary?.histroyRecordCount ?? '-')}
+              </p>
+            </div>
           </div>
 
           {/* Response Time Graph - takes up remaining space */}
           <div className="flex-1 min-h-[160px]">
             <ResponseTimeGraph history={history || []} isLoading={isLoading} />
           </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/50">
-          <div className="text-xs text-muted-foreground">
-            {summary?.histroyRecordCount ?? '-'} records
-          </div>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8"
-            onClick={onEdit}
-            title="Edit watch"
-          >
-            <Pencil className="w-4 h-4" />
-          </Button>
         </div>
       </CardContent>
     </Card>
