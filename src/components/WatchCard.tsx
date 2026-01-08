@@ -93,30 +93,33 @@ export function WatchCard({
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button 
-                className="inline-flex items-center gap-0.5 rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                {filterLabel}
-                <ChevronDown className="w-3 h-3" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-[80px]">
-              {HISTORY_FILTER_OPTIONS.map((option) => (
-                <DropdownMenuItem
-                  key={option.value}
-                  onClick={() => onHistoryFilterChange(option.value)}
-                  className={cn(
-                    'text-xs cursor-pointer',
-                    historyFilter === option.value && 'bg-accent'
-                  )}
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground">Last</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button 
+                  className="inline-flex items-center gap-0.5 rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  {filterLabel}
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="min-w-[80px]">
+                {HISTORY_FILTER_OPTIONS.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => onHistoryFilterChange(option.value)}
+                    className={cn(
+                      'text-xs cursor-pointer',
+                      historyFilter === option.value && 'bg-accent'
+                    )}
+                  >
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <Badge variant={active ? 'default' : 'secondary'} className="text-xs">
             {active ? 'Active' : 'Inactive'}
           </Badge>
