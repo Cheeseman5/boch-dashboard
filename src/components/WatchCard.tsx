@@ -88,40 +88,38 @@ export function WatchCard({
         </div>
       </CardHeader>
 
-      <CardContent>
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Response Time Stats - compact sidebar */}
-          <div className="flex lg:flex-col gap-4 lg:gap-2 lg:w-24 shrink-0">
-            <div className="text-center lg:text-left">
-              <p className="text-xs text-muted-foreground">Min</p>
-              <p className="text-lg font-mono font-medium">
-                {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.min)}
-              </p>
-            </div>
-            <div className="text-center lg:text-left">
-              <p className="text-xs text-muted-foreground">Avg</p>
-              <p className="text-lg font-mono font-medium">
-                {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.avg)}
-              </p>
-            </div>
-            <div className="text-center lg:text-left">
-              <p className="text-xs text-muted-foreground">Max</p>
-              <p className="text-lg font-mono font-medium">
-                {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.max)}
-              </p>
-            </div>
-            <div className="text-center lg:text-left">
-              <p className="text-xs text-muted-foreground">Records</p>
-              <p className="text-lg font-mono font-medium">
-                {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : (summary?.histroyRecordCount ?? '-')}
-              </p>
-            </div>
+      <CardContent className="space-y-3">
+        {/* Metrics row - horizontal */}
+        <div className="flex gap-6">
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">Records</p>
+            <p className="text-lg font-mono font-medium">
+              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : (summary?.histroyRecordCount ?? '-')}
+            </p>
           </div>
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">Min</p>
+            <p className="text-lg font-mono font-medium">
+              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.min)}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">Avg</p>
+            <p className="text-lg font-mono font-medium">
+              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.avg)}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">Max</p>
+            <p className="text-lg font-mono font-medium">
+              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.max)}
+            </p>
+          </div>
+        </div>
 
-          {/* Response Time Graph - takes up remaining space */}
-          <div className="flex-1 min-h-[160px]">
-            <ResponseTimeGraph history={history || []} isLoading={isLoading} />
-          </div>
+        {/* Response Time Graph - full width */}
+        <div className="h-[120px]">
+          <ResponseTimeGraph history={history || []} isLoading={isLoading} />
         </div>
       </CardContent>
     </Card>
