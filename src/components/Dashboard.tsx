@@ -50,23 +50,22 @@ export function Dashboard() {
   const [deletingWatch, setDeletingWatch] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const fetchWatchData = useCallback(async (watch: Watch, limit?: number): Promise<WatchWithData> => {
+  const fetchWatchData = useCallback(async (watch: Watch): Promise<WatchWithData> => {
     try {
-      if (import.meta.env.DEV) {
-        console.debug('[boch] fetchWatchData for', watch.name, 'limit:', limit);
-      }
-
       const [summary, historyResponse] = await Promise.all([
         getHistorySummary(apiKey, watch.name),
-        getHistory(apiKey, watch.name, limit),
+        getHistory(apiKey, watch.name), // Always fetch all records
       ]);
 
-      const status = calculateWatchStatus(summary, historyResponse.records);
+      // Strip peekResponseContent to reduce memory usage
+      const strippedRecords = historyResponse.records.map(({ peekResponseContent, ...rest }) => rest);
+
+      const status = calculateWatchStatus(summary, strippedRecords);
 
       return {
         ...watch,
         summary,
-        history: historyResponse.records,
+        history: strippedRecords,
         status,
         isLoading: false,
       };
@@ -79,24 +78,10 @@ export function Dashboard() {
     }
   }, [apiKey]);
 
-  const handleHistoryFilterChange = useCallback(async (watchName: string, filter: HistoryFilter) => {
+  // History filter only affects what is displayed, not what is fetched
+  const handleHistoryFilterChange = useCallback((watchName: string, filter: HistoryFilter) => {
     setHistoryFilters(prev => ({ ...prev, [watchName]: filter }));
-    
-    // Find the watch and refetch with new limit
-    const watch = watches.find(w => w.name === watchName);
-    if (!watch) return;
-    
-    // Set loading state for this watch
-    setWatches(prev => prev.map(w => 
-      w.name === watchName ? { ...w, isLoading: true } : w
-    ));
-    
-    const limit = filter === 'all' ? undefined : filter;
-    const watchWithData = await fetchWatchData(watch, limit);
-    setWatches(prev => prev.map(w => 
-      w.name === watchName ? watchWithData : w
-    ));
-  }, [watches, fetchWatchData]);
+  }, []);
 
   const refreshData = useCallback(async () => {
     if (!apiKey) return;

@@ -2,9 +2,14 @@ import type {
   Watch,
   AddWatchRequest,
   UpdateWatchRequest,
-  HistoryResponse,
+  HistoryRaw,
   HistorySummaryResponse,
 } from '@/types/api';
+
+export interface HistoryResponseRaw {
+  watchName: string;
+  records: HistoryRaw[];
+}
 
 const BASE_URL = 'https://boch.p.rapidapi.com';
 
@@ -83,12 +88,10 @@ export async function deleteWatch(apiKey: string, watchName: string): Promise<vo
 
 export async function getHistory(
   apiKey: string,
-  watchName: string,
-  limit?: number
-): Promise<HistoryResponse> {
-  const params = limit ? `?limit=${limit}` : '';
-  return apiRequest<HistoryResponse>(
-    `/api/history/${encodePathSegment(watchName)}${params}`,
+  watchName: string
+): Promise<HistoryResponseRaw> {
+  return apiRequest<HistoryResponseRaw>(
+    `/api/history/${encodePathSegment(watchName)}`,
     apiKey
   );
 }
