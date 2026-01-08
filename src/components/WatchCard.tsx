@@ -116,7 +116,7 @@ export function WatchCard({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <div className="flex items-center gap-1">
             <span className="text-xs text-muted-foreground">Last</span>
             <DropdownMenu>
@@ -143,6 +143,9 @@ export function WatchCard({
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+            <span className="text-xs text-muted-foreground">
+              / {isLoading ? '...' : metrics.count} records
+            </span>
           </div>
           <Badge variant={active ? 'default' : 'secondary'} className="text-xs">
             {active ? 'Active' : 'Inactive'}
@@ -165,14 +168,8 @@ export function WatchCard({
       <CardContent className="pt-0 px-3 pb-3">
         {/* Side-by-side: metrics on left, graph on right */}
         <div className="flex gap-3">
-          {/* Metrics - stacked vertically */}
+          {/* Metrics - stacked vertically (no Records, moved to header) */}
           <div className="flex flex-col justify-center gap-0.5 min-w-[70px]">
-            <div>
-              <p className="text-[10px] text-muted-foreground leading-tight">Records</p>
-              <p className="text-sm font-mono font-medium leading-tight">
-                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : (metrics.count ?? '-')}
-              </p>
-            </div>
             <div>
               <p className="text-[10px] text-muted-foreground leading-tight">Min</p>
               <p className="text-sm font-mono font-medium leading-tight">
