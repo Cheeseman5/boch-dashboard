@@ -14,28 +14,31 @@ interface ResponseTimeGraphProps {
   isLoading?: boolean;
 }
 
-interface TooltipPayload {
-  dateTime: string;
+interface BucketData {
+  startDateTime: string;
+  endDateTime: string;
   responseTimeMs: number;
-  statusCode: number;
+  count: number;
 }
 
-function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: TooltipPayload }> }) {
+function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: BucketData }> }) {
   if (!active || !payload || !payload.length) return null;
 
   const data = payload[0].payload;
-  const isSuccess = data.statusCode >= 200 && data.statusCode < 300;
 
   return (
     <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
       <p className="text-xs text-muted-foreground mb-1">
-        {format(new Date(data.dateTime), 'MMM d, yyyy HH:mm:ss')}
+        {format(new Date(data.startDateTime), 'MMM d, HH:mm:ss')}
+      </p>
+      <p className="text-xs text-muted-foreground mb-2">
+        → {format(new Date(data.endDateTime), 'MMM d, HH:mm:ss')}
       </p>
       <p className="text-sm font-medium">
-        {data.responseTimeMs}ms
+        P95: {data.responseTimeMs}ms
       </p>
-      <p className={`text-xs ${isSuccess ? 'text-stoplight-green' : 'text-stoplight-red'}`}>
-        Status: {data.statusCode}
+      <p className="text-xs text-muted-foreground">
+        {data.count} request{data.count !== 1 ? 's' : ''}
       </p>
     </div>
   );
@@ -56,23 +59,44 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
     );
   }
 
-  // Take max 90 data points, sorted by date
-  const chartData = [...history]
-    .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
-    .slice(-90)
-    .map((h) => ({
-      dateTime: h.dateTime,
-      responseTimeMs: h.responseTimeMs,
-      statusCode: h.statusCode,
-    }));
+  // Sort history by date
+  const sortedHistory = [...history].sort(
+    (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+  );
+
+  // Calculate P95 for an array of values
+  const calculateP95 = (values: number[]): number => {
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const index = Math.ceil(sorted.length * 0.95) - 1;
+    return sorted[Math.max(0, index)];
+  };
+
+  // Group into max 90 buckets
+  const maxBuckets = 90;
+  const bucketSize = Math.ceil(sortedHistory.length / maxBuckets);
+  
+  const chartData: BucketData[] = [];
+  for (let i = 0; i < sortedHistory.length; i += bucketSize) {
+    const bucket = sortedHistory.slice(i, i + bucketSize);
+    if (bucket.length === 0) continue;
+    
+    const responseTimes = bucket.map((h) => h.responseTimeMs);
+    chartData.push({
+      startDateTime: bucket[0].dateTime,
+      endDateTime: bucket[bucket.length - 1].dateTime,
+      responseTimeMs: calculateP95(responseTimes),
+      count: bucket.length,
+    });
+  }
 
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
   const minResponse = Math.min(...responseTimes);
   const maxResponse = Math.max(...responseTimes);
   
-  const firstDate = chartData[0]?.dateTime;
-  const lastDate = chartData[chartData.length - 1]?.dateTime;
+  const firstDate = chartData[0]?.startDateTime;
+  const lastDate = chartData[chartData.length - 1]?.endDateTime;
 
   return (
     <div className="h-full w-full min-h-[160px] flex flex-col">
