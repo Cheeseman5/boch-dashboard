@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Trash2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -17,10 +18,11 @@ interface WatchDialogProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: AddWatchRequest | UpdateWatchRequest, originalName?: string) => Promise<void>;
+  onDelete?: (name: string) => void;
   watch?: Watch;
 }
 
-export function WatchDialog({ open, onClose, onSave, watch }: WatchDialogProps) {
+export function WatchDialog({ open, onClose, onSave, onDelete, watch }: WatchDialogProps) {
   const isEdit = !!watch;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -151,13 +153,31 @@ export function WatchDialog({ open, onClose, onSave, watch }: WatchDialogProps) 
             <p className="text-sm text-destructive">{error}</p>
           )}
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading || !name.trim()}>
-              {isLoading ? 'Saving...' : isEdit ? 'Update' : 'Create'}
-            </Button>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <div className="flex-1">
+              {isEdit && onDelete && (
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => {
+                    onDelete(watch.name);
+                    onClose();
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading || !name.trim()}>
+                {isLoading ? 'Saving...' : isEdit ? 'Update' : 'Create'}
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>

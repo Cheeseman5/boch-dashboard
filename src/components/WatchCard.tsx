@@ -1,4 +1,4 @@
-import { Pencil, Trash2, GripHorizontal } from 'lucide-react';
+import { Pencil, GripHorizontal } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,8 +10,6 @@ import { cn } from '@/lib/utils';
 interface WatchCardProps {
   watch: WatchWithData;
   onEdit: () => void;
-  
-  onDelete: () => void;
   isDragging?: boolean;
   isGhost?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
@@ -23,9 +21,7 @@ interface WatchCardProps {
 
 export function WatchCard({ 
   watch, 
-  onEdit, 
-   
-  onDelete,
+  onEdit,
   isDragging,
   isGhost,
   onDragStart,
@@ -118,26 +114,15 @@ export function WatchCard({
           <div className="text-xs text-muted-foreground">
             {summary?.histroyRecordCount ?? '-'} records
           </div>
-          <div className="flex items-center gap-1">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8"
-              onClick={onEdit}
-              title="Edit watch"
-            >
-              <Pencil className="w-4 h-4" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8 text-destructive hover:text-destructive"
-              onClick={onDelete}
-              title="Delete watch"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8"
+            onClick={onEdit}
+            title="Edit watch"
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
         </div>
       </CardContent>
     </Card>

@@ -436,7 +436,6 @@ export function Dashboard() {
                 key={watch.name}
                 watch={watch}
                 onEdit={() => handleEditWatch(watch)}
-                onDelete={() => handleDeleteClick(watch.name)}
                 isDragging={draggedWatch === watch.name}
                 isGhost={draggedWatch !== null && dragOverWatch !== null && watch.name === draggedWatch}
                 onDragStart={(e) => handleDragStart(e, watch.name)}
@@ -455,6 +454,7 @@ export function Dashboard() {
         open={watchDialogOpen}
         onClose={() => setWatchDialogOpen(false)}
         onSave={handleSaveWatch}
+        onDelete={handleDeleteClick}
         watch={editingWatch}
       />
 
