@@ -90,13 +90,12 @@ export function WatchCard({
         <div className="flex items-center gap-1 shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Badge 
-                variant="outline" 
-                className="text-xs cursor-pointer hover:bg-accent flex items-center gap-0.5"
+              <button 
+                className="inline-flex items-center gap-0.5 rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
                 {filterLabel}
                 <ChevronDown className="w-3 h-3" />
-              </Badge>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="min-w-[80px]">
               {HISTORY_FILTER_OPTIONS.map((option) => (
@@ -104,7 +103,7 @@ export function WatchCard({
                   key={option.value}
                   onClick={() => onHistoryFilterChange(option.value)}
                   className={cn(
-                    'text-xs',
+                    'text-xs cursor-pointer',
                     historyFilter === option.value && 'bg-accent'
                   )}
                 >
