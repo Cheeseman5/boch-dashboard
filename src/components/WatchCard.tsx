@@ -186,7 +186,7 @@ export function WatchCard({
       </CardHeader>
 
       <CardContent className="pt-0 px-3 pb-3">
-        {/* Side-by-side: metrics on left, graph on right */}
+        {/* Side-by-side: metrics on left, graph in center, status codes on right */}
         <div className="flex gap-3">
           {/* Metrics - stacked vertically (no Records, moved to header) */}
           <div className="flex flex-col justify-center gap-0.5 min-w-[70px]">
@@ -219,6 +219,36 @@ export function WatchCard({
           {/* Response Time Graph - fills remaining width */}
           <div className="flex-1 h-[100px]">
             <ResponseTimeGraph history={filteredHistory || []} isLoading={isLoading} />
+          </div>
+
+          {/* Status Code Summary - scrollable */}
+          <div className="flex flex-col min-w-[60px] max-w-[80px]">
+            <p className="text-[10px] text-muted-foreground leading-tight mb-0.5">Status</p>
+            <div className="flex-1 overflow-y-auto max-h-[88px]">
+              {isLoading ? (
+                <span className="skeleton-pulse inline-block w-full h-3" />
+              ) : filteredSummary?.statusSummary && Object.keys(filteredSummary.statusSummary).length > 0 ? (
+                Object.entries(filteredSummary.statusSummary)
+                  .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                  .map(([code, count]) => {
+                    const numCode = parseInt(code, 10);
+                    const isError = numCode >= 400 || numCode === 0;
+                    const isWarning = numCode < 200 || numCode >= 300;
+                    return (
+                      <div key={code} className="flex justify-between items-center gap-1 text-xs font-mono leading-tight">
+                        <span className={cn(
+                          isError ? 'text-red-500' : isWarning ? 'text-yellow-500' : 'text-green-500'
+                        )}>
+                          {code}
+                        </span>
+                        <span className="text-muted-foreground">×{count}</span>
+                      </div>
+                    );
+                  })
+              ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>
