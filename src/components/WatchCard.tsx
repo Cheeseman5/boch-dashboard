@@ -81,7 +81,7 @@ export function WatchCard({
 
   const formatMs = (ms?: number) => {
     if (ms === undefined || ms === null) return '-';
-    return `${Math.round(ms)}ms`;
+    return `${Math.round(ms).toLocaleString()} ms`;
   };
 
   return (
