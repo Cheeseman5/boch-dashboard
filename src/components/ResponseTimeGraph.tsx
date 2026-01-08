@@ -99,13 +99,13 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
   const lastDate = chartData[chartData.length - 1]?.endDateTime;
 
   return (
-    <div className="h-full w-full min-h-[160px] flex flex-col">
+    <div className="h-full w-full min-h-[100px] flex flex-col overflow-hidden">
       <div className="flex-1 min-h-0 flex">
         {/* Y-axis labels on left */}
-        <div className="flex flex-col justify-between items-end pr-2 py-1">
-          <span className="text-[10px] text-muted-foreground">{maxResponse}ms</span>
-          <span className="text-[10px] text-muted-foreground -rotate-90 origin-center whitespace-nowrap">Response Time</span>
-          <span className="text-[10px] text-muted-foreground">{minResponse}ms</span>
+        <div className="flex flex-col justify-between items-end pr-1 py-1 shrink-0">
+          <span className="text-[9px] text-muted-foreground leading-none">{maxResponse}ms</span>
+          <span className="text-[8px] text-muted-foreground leading-none">ms</span>
+          <span className="text-[9px] text-muted-foreground leading-none">{minResponse}ms</span>
         </div>
         
         {/* Chart area */}
@@ -146,12 +146,11 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
       </div>
       
       {/* X-axis label with bounds */}
-      <div className="flex items-center justify-between mt-1 pl-12">
-        <span className="text-[10px] text-muted-foreground">
+      <div className="flex items-center justify-between pl-8 shrink-0">
+        <span className="text-[9px] text-muted-foreground truncate">
           {firstDate ? format(new Date(firstDate), 'MMM d, HH:mm') : ''}
         </span>
-        <span className="text-[10px] text-muted-foreground font-medium">Time</span>
-        <span className="text-[10px] text-muted-foreground">
+        <span className="text-[9px] text-muted-foreground truncate">
           {lastDate ? format(new Date(lastDate), 'MMM d, HH:mm') : ''}
         </span>
       </div>

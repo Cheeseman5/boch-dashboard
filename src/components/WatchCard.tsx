@@ -88,7 +88,7 @@ export function WatchCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-1.5 pt-0">
         {/* Metrics row - horizontal */}
         <div className="flex gap-6">
           <div className="text-center">
