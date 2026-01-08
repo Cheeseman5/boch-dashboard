@@ -55,6 +55,30 @@ export function WatchCard({
     ? history 
     : history?.slice(-historyFilter);
 
+  // Calculate metrics from filtered data, or use summary when 'all'
+  const metrics = (() => {
+    if (historyFilter === 'all' && summary) {
+      return {
+        count: summary.histroyRecordCount,
+        min: summary.responseTime?.min,
+        avg: summary.responseTime?.avg,
+        max: summary.responseTime?.max,
+      };
+    }
+    
+    if (!filteredHistory || filteredHistory.length === 0) {
+      return { count: 0, min: undefined, avg: undefined, max: undefined };
+    }
+    
+    const times = filteredHistory.map(h => h.responseTimeMs);
+    return {
+      count: filteredHistory.length,
+      min: Math.min(...times),
+      avg: times.reduce((a, b) => a + b, 0) / times.length,
+      max: Math.max(...times),
+    };
+  })();
+
   const formatMs = (ms?: number) => {
     if (ms === undefined || ms === null) return '-';
     return `${Math.round(ms)}ms`;
@@ -139,30 +163,30 @@ export function WatchCard({
       </CardHeader>
 
       <CardContent className="space-y-1 pt-0 px-3 pb-3">
-        {/* Metrics row - horizontal */}
-        <div className="flex gap-4">
+        {/* Metrics row - horizontally centered */}
+        <div className="flex justify-center gap-6">
           <div className="text-center">
             <p className="text-xs text-muted-foreground">Records</p>
             <p className="text-base font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : (summary?.histroyRecordCount ?? '-')}
+              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : (metrics.count ?? '-')}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground">Min</p>
             <p className="text-base font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(summary?.responseTime?.min)}
+              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(metrics.min)}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground">Avg</p>
             <p className="text-base font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(summary?.responseTime?.avg)}
+              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(metrics.avg)}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground">Max</p>
             <p className="text-base font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(summary?.responseTime?.max)}
+              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(metrics.max)}
             </p>
           </div>
         </div>
