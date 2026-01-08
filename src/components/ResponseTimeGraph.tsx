@@ -67,6 +67,10 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
   const sortedHistory = [...history].sort(
     (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
   );
+  
+  if (import.meta.env.DEV) {
+    console.debug('[ResponseTimeGraph] Rendering with', history.length, 'records')
+  }
 
   // Calculate P95 for an array of values
   const calculateP95 = (values: number[]): number => {
