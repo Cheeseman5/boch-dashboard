@@ -24,11 +24,18 @@ export interface CheckEndpointResponse {
   context: string;
 }
 
-export interface History {
+export interface HistoryRaw {
   dateTime: string;
   statusCode: number;
   responseTimeMs: number;
   peekResponseContent: string;
+}
+
+// Stripped version without peekResponseContent to reduce memory
+export interface History {
+  dateTime: string;
+  statusCode: number;
+  responseTimeMs: number;
 }
 
 export interface HistoryResponse {

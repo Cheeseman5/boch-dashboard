@@ -50,6 +50,11 @@ export function WatchCard({
   
   const filterLabel = HISTORY_FILTER_OPTIONS.find(o => o.value === historyFilter)?.label ?? 'All';
 
+  // Filter history client-side based on the selected filter
+  const filteredHistory = historyFilter === 'all' 
+    ? history 
+    : history?.slice(-historyFilter);
+
   const formatMs = (ms?: number) => {
     if (ms === undefined || ms === null) return '-';
     return `${Math.round(ms)}ms`;
@@ -161,7 +166,7 @@ export function WatchCard({
 
         {/* Response Time Graph - full width */}
         <div className="h-[100px]">
-          <ResponseTimeGraph history={history || []} isLoading={isLoading} />
+          <ResponseTimeGraph history={filteredHistory || []} isLoading={isLoading} />
         </div>
       </CardContent>
     </Card>
