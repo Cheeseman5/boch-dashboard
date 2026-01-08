@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   AreaChart,
   Area,
@@ -45,6 +46,9 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
 }
 
 export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps) {
+  // Generate unique ID for this chart instance to avoid gradient conflicts
+  const chartId = React.useId().replace(/:/g, '');
+
   if (isLoading) {
     return (
       <div className="h-full w-full min-h-[160px] skeleton-pulse" />
@@ -163,8 +167,8 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
 
   // Determine the dominant color for the stroke (based on max value)
   const getStrokeColor = () => {
-    if (maxResponse >= RED_THRESHOLD) return 'url(#strokeGradient)';
-    if (maxResponse >= YELLOW_THRESHOLD) return 'url(#strokeGradient)';
+    if (maxResponse >= RED_THRESHOLD) return `url(#strokeGradient-${chartId})`;
+    if (maxResponse >= YELLOW_THRESHOLD) return `url(#strokeGradient-${chartId})`;
     return 'hsl(var(--stoplight-green))';
   };
 
@@ -183,12 +187,12 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
               <defs>
-                <linearGradient id="strokeGradient" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={`strokeGradient-${chartId}`} x1="0" y1="0" x2="0" y2="1">
                   {gradientStops.map((stop, i) => (
                     <stop key={i} offset={stop.offset} stopColor={stop.color} />
                   ))}
                 </linearGradient>
-                <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={`fillGradient-${chartId}`} x1="0" y1="0" x2="0" y2="1">
                   {gradientStops.map((stop, i) => (
                     <stop key={i} offset={stop.offset} stopColor={stop.color} stopOpacity={i === 0 ? 0.3 : 0} />
                   ))}
@@ -212,7 +216,7 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
                 dataKey="responseTimeMs"
                 stroke={getStrokeColor()}
                 strokeWidth={2}
-                fill="url(#fillGradient)"
+                fill={`url(#fillGradient-${chartId})`}
                 dot={false}
                 activeDot={{ r: 4, fill: 'hsl(var(--graph-line))' }}
               />
