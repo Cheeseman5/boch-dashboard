@@ -76,7 +76,7 @@ export async function updateWatch(
 }
 
 export async function deleteWatch(apiKey: string, watchName: string): Promise<void> {
-  await apiRequest(`/api/watch/${encodePathSegment(watchName)}`, apiKey, {
+  await apiRequest(`/api/watches/${encodePathSegment(watchName)}`, apiKey, {
     method: 'DELETE',
   });
 }
