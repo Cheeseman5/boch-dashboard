@@ -59,8 +59,8 @@ export function WatchCard({
         <GripHorizontal className="w-5 h-5" />
       </div>
 
-      <CardHeader className="flex flex-row items-start justify-between gap-4 pb-2 pt-6">
-        <div className="flex items-center gap-3 min-w-0">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-1 pt-5 px-3">
+        <div className="flex items-center gap-2 min-w-0">
           <Stoplight status={status} animate={!isLoading && status !== 'grey'} />
           <div className="min-w-0">
             <h3 className="font-semibold truncate">{name}</h3>
@@ -69,7 +69,7 @@ export function WatchCard({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           <Badge variant={active ? 'default' : 'secondary'} className="text-xs">
             {active ? 'Active' : 'Inactive'}
           </Badge>
@@ -79,7 +79,7 @@ export function WatchCard({
           <Button 
             variant="ghost" 
             size="icon" 
-            className="h-8 w-8"
+            className="h-7 w-7"
             onClick={onEdit}
             title="Edit watch"
           >
@@ -88,37 +88,37 @@ export function WatchCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-1.5 pt-0">
+      <CardContent className="space-y-1 pt-0 px-3 pb-3">
         {/* Metrics row - horizontal */}
-        <div className="flex gap-6">
+        <div className="flex gap-4">
           <div className="text-center">
             <p className="text-xs text-muted-foreground">Records</p>
-            <p className="text-lg font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : (summary?.histroyRecordCount ?? '-')}
+            <p className="text-base font-mono font-medium">
+              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : (summary?.histroyRecordCount ?? '-')}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground">Min</p>
-            <p className="text-lg font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.min)}
+            <p className="text-base font-mono font-medium">
+              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(summary?.responseTime?.min)}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground">Avg</p>
-            <p className="text-lg font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.avg)}
+            <p className="text-base font-mono font-medium">
+              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(summary?.responseTime?.avg)}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground">Max</p>
-            <p className="text-lg font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-12 h-5" /> : formatMs(summary?.responseTime?.max)}
+            <p className="text-base font-mono font-medium">
+              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(summary?.responseTime?.max)}
             </p>
           </div>
         </div>
 
         {/* Response Time Graph - full width */}
-        <div className="h-[120px]">
+        <div className="h-[100px]">
           <ResponseTimeGraph history={history || []} isLoading={isLoading} />
         </div>
       </CardContent>
