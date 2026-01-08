@@ -162,38 +162,41 @@ export function WatchCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-1 pt-0 px-3 pb-3">
-        {/* Metrics row - horizontally centered */}
-        <div className="flex justify-center gap-6">
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">Records</p>
-            <p className="text-base font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : (metrics.count ?? '-')}
-            </p>
+      <CardContent className="pt-0 px-3 pb-3">
+        {/* Side-by-side: metrics on left, graph on right */}
+        <div className="flex gap-3">
+          {/* Metrics - stacked vertically */}
+          <div className="flex flex-col justify-center gap-0.5 min-w-[70px]">
+            <div>
+              <p className="text-[10px] text-muted-foreground leading-tight">Records</p>
+              <p className="text-sm font-mono font-medium leading-tight">
+                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : (metrics.count ?? '-')}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground leading-tight">Min</p>
+              <p className="text-sm font-mono font-medium leading-tight">
+                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : formatMs(metrics.min)}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground leading-tight">Avg</p>
+              <p className="text-sm font-mono font-medium leading-tight">
+                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : formatMs(metrics.avg)}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground leading-tight">Max</p>
+              <p className="text-sm font-mono font-medium leading-tight">
+                {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : formatMs(metrics.max)}
+              </p>
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">Min</p>
-            <p className="text-base font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(metrics.min)}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">Avg</p>
-            <p className="text-base font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(metrics.avg)}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">Max</p>
-            <p className="text-base font-mono font-medium">
-              {isLoading ? <span className="skeleton-pulse inline-block w-10 h-4" /> : formatMs(metrics.max)}
-            </p>
-          </div>
-        </div>
 
-        {/* Response Time Graph - full width */}
-        <div className="h-[100px]">
-          <ResponseTimeGraph history={filteredHistory || []} isLoading={isLoading} />
+          {/* Response Time Graph - fills remaining width */}
+          <div className="flex-1 h-[100px]">
+            <ResponseTimeGraph history={filteredHistory || []} isLoading={isLoading} />
+          </div>
         </div>
       </CardContent>
     </Card>
