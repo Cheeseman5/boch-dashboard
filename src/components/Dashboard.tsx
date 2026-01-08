@@ -436,7 +436,6 @@ export function Dashboard() {
                 key={watch.name}
                 watch={watch}
                 onEdit={() => handleEditWatch(watch)}
-                onToggle={() => handleToggleWatch(watch)}
                 onDelete={() => handleDeleteClick(watch.name)}
                 isDragging={draggedWatch === watch.name}
                 isGhost={draggedWatch !== null && dragOverWatch !== null && watch.name === draggedWatch}

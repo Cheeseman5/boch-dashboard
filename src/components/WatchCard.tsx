@@ -1,4 +1,4 @@
-import { Pencil, Pause, Play, Trash2, GripHorizontal } from 'lucide-react';
+import { Pencil, Trash2, GripHorizontal } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 interface WatchCardProps {
   watch: WatchWithData;
   onEdit: () => void;
-  onToggle: () => void;
+  
   onDelete: () => void;
   isDragging?: boolean;
   isGhost?: boolean;
@@ -24,7 +24,7 @@ interface WatchCardProps {
 export function WatchCard({ 
   watch, 
   onEdit, 
-  onToggle, 
+   
   onDelete,
   isDragging,
   isGhost,
@@ -119,15 +119,6 @@ export function WatchCard({
             {summary?.histroyRecordCount ?? '-'} records
           </div>
           <div className="flex items-center gap-1">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8"
-              onClick={onToggle}
-              title={active ? 'Pause watch' : 'Resume watch'}
-            >
-              {active ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </Button>
             <Button 
               variant="ghost" 
               size="icon" 
