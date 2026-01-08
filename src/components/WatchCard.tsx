@@ -10,8 +10,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Stoplight } from './Stoplight';
 import { ResponseTimeGraph } from './ResponseTimeGraph';
-import type { WatchWithData, HistoryFilter } from '@/types/api';
+import type { WatchWithData, HistoryFilter, HistorySummaryResponse } from '@/types/api';
 import { cn } from '@/lib/utils';
+import { calculateWatchStatus } from '@/lib/stoplight';
 
 const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] = [
   { value: 30, label: '30' },
@@ -46,7 +47,7 @@ export function WatchCard({
   onDragEnd,
   onDrop,
 }: WatchCardProps) {
-  const { name, url, intervalMinutes, active, summary, history, status, isLoading } = watch;
+  const { name, url, intervalMinutes, active, summary, history, isLoading } = watch;
   
   const filterLabel = HISTORY_FILTER_OPTIONS.find(o => o.value === historyFilter)?.label ?? 'All';
 
@@ -54,6 +55,25 @@ export function WatchCard({
   const filteredHistory = historyFilter === 'all' 
     ? history 
     : history?.slice(-historyFilter);
+
+  // Calculate status based on filtered data
+  const filteredSummary: HistorySummaryResponse | undefined = filteredHistory && filteredHistory.length > 0 && summary
+    ? {
+        ...summary,
+        histroyRecordCount: filteredHistory.length,
+        statusSummary: filteredHistory.reduce((acc, h) => {
+          acc[h.statusCode] = (acc[h.statusCode] || 0) + 1;
+          return acc;
+        }, {} as Record<number, number>),
+        responseTime: {
+          min: Math.min(...filteredHistory.map(h => h.responseTimeMs)),
+          avg: filteredHistory.reduce((a, h) => a + h.responseTimeMs, 0) / filteredHistory.length,
+          max: Math.max(...filteredHistory.map(h => h.responseTimeMs)),
+        },
+      }
+    : summary;
+
+  const status = calculateWatchStatus(filteredSummary, filteredHistory);
 
   // Calculate metrics from filtered data, or use summary when 'all'
   const metrics = (() => {
