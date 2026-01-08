@@ -1,4 +1,4 @@
-import { Pencil, GripHorizontal } from 'lucide-react';
+import { Pencil, GripHorizontal, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -73,7 +73,8 @@ export function WatchCard({
           <Badge variant={active ? 'default' : 'secondary'} className="text-xs">
             {active ? 'Active' : 'Inactive'}
           </Badge>
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs gap-1">
+            <Clock className="w-3 h-3" />
             {intervalMinutes}m
           </Badge>
           <Button 
