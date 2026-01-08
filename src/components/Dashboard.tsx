@@ -25,6 +25,7 @@ import type {
   AddWatchRequest,
   UpdateWatchRequest,
   StoplightStatus,
+  HistoryFilter,
 } from '@/types/api';
 import { toast } from '@/hooks/use-toast';
 
@@ -38,6 +39,7 @@ export function Dashboard() {
   const [watches, setWatches] = useState<WatchWithData[]>([]);
   const [watchOrder, setWatchOrder] = useState<string[]>([]);
   const [showInactive, setShowInactive] = useState(false);
+  const [historyFilters, setHistoryFilters] = useState<Record<string, HistoryFilter>>({});
   const [draggedWatch, setDraggedWatch] = useState<string | null>(null);
   const [dragOverWatch, setDragOverWatch] = useState<string | null>(null);
 
@@ -48,15 +50,15 @@ export function Dashboard() {
   const [deletingWatch, setDeletingWatch] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const fetchWatchData = useCallback(async (watch: Watch): Promise<WatchWithData> => {
+  const fetchWatchData = useCallback(async (watch: Watch, limit?: number): Promise<WatchWithData> => {
     try {
       if (import.meta.env.DEV) {
-        console.debug('[boch] fetchWatchData for', watch.name);
+        console.debug('[boch] fetchWatchData for', watch.name, 'limit:', limit);
       }
 
       const [summary, historyResponse] = await Promise.all([
         getHistorySummary(apiKey, watch.name),
-        getHistory(apiKey, watch.name),
+        getHistory(apiKey, watch.name, limit),
       ]);
 
       const status = calculateWatchStatus(summary, historyResponse.records);
@@ -76,6 +78,25 @@ export function Dashboard() {
       };
     }
   }, [apiKey]);
+
+  const handleHistoryFilterChange = useCallback(async (watchName: string, filter: HistoryFilter) => {
+    setHistoryFilters(prev => ({ ...prev, [watchName]: filter }));
+    
+    // Find the watch and refetch with new limit
+    const watch = watches.find(w => w.name === watchName);
+    if (!watch) return;
+    
+    // Set loading state for this watch
+    setWatches(prev => prev.map(w => 
+      w.name === watchName ? { ...w, isLoading: true } : w
+    ));
+    
+    const limit = filter === 'all' ? undefined : filter;
+    const watchWithData = await fetchWatchData(watch, limit);
+    setWatches(prev => prev.map(w => 
+      w.name === watchName ? watchWithData : w
+    ));
+  }, [watches, fetchWatchData]);
 
   const refreshData = useCallback(async () => {
     if (!apiKey) return;
@@ -458,6 +479,8 @@ export function Dashboard() {
               <WatchCard
                 key={watch.name}
                 watch={watch}
+                historyFilter={historyFilters[watch.name] ?? 'all'}
+                onHistoryFilterChange={(filter) => handleHistoryFilterChange(watch.name, filter)}
                 onEdit={() => handleEditWatch(watch)}
                 isDragging={draggedWatch === watch.name}
                 isGhost={draggedWatch !== null && dragOverWatch !== null && watch.name === draggedWatch}

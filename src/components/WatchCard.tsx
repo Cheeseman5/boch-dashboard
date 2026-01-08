@@ -1,14 +1,28 @@
-import { Pencil, GripHorizontal } from 'lucide-react';
+import { Pencil, GripHorizontal, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Stoplight } from './Stoplight';
 import { ResponseTimeGraph } from './ResponseTimeGraph';
-import type { WatchWithData } from '@/types/api';
+import type { WatchWithData, HistoryFilter } from '@/types/api';
 import { cn } from '@/lib/utils';
 
+const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] = [
+  { value: 30, label: '30' },
+  { value: 90, label: '90' },
+  { value: 180, label: '180' },
+  { value: 'all', label: 'All' },
+];
 interface WatchCardProps {
   watch: WatchWithData;
+  historyFilter: HistoryFilter;
+  onHistoryFilterChange: (filter: HistoryFilter) => void;
   onEdit: () => void;
   isDragging?: boolean;
   isGhost?: boolean;
@@ -21,6 +35,8 @@ interface WatchCardProps {
 
 export function WatchCard({ 
   watch, 
+  historyFilter,
+  onHistoryFilterChange,
   onEdit,
   isDragging,
   isGhost,
@@ -31,6 +47,8 @@ export function WatchCard({
   onDrop,
 }: WatchCardProps) {
   const { name, url, intervalMinutes, active, summary, history, status, isLoading } = watch;
+  
+  const filterLabel = HISTORY_FILTER_OPTIONS.find(o => o.value === historyFilter)?.label ?? 'All';
 
   const formatMs = (ms?: number) => {
     if (ms === undefined || ms === null) return '-';
@@ -70,6 +88,31 @@ export function WatchCard({
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Badge 
+                variant="outline" 
+                className="text-xs cursor-pointer hover:bg-accent flex items-center gap-0.5"
+              >
+                {filterLabel}
+                <ChevronDown className="w-3 h-3" />
+              </Badge>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="min-w-[80px]">
+              {HISTORY_FILTER_OPTIONS.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => onHistoryFilterChange(option.value)}
+                  className={cn(
+                    'text-xs',
+                    historyFilter === option.value && 'bg-accent'
+                  )}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Badge variant={active ? 'default' : 'secondary'} className="text-xs">
             {active ? 'Active' : 'Inactive'}
           </Badge>

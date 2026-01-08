@@ -61,6 +61,8 @@ export interface Watch {
 
 export type StoplightStatus = 'green' | 'yellow' | 'red' | 'grey';
 
+export type HistoryFilter = 30 | 90 | 180 | 'all';
+
 export interface WatchWithData extends Watch {
   summary?: HistorySummaryResponse;
   history?: History[];
