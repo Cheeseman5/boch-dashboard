@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { RefreshCw, Plus, Activity, Settings } from 'lucide-react';
+import { RefreshCw, Plus, Settings } from 'lucide-react';
+import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -338,7 +339,7 @@ export function Dashboard() {
           <div className="flex items-center justify-between gap-4">
             {/* Logo & Title */}
             <div className="flex items-center gap-2 shrink-0">
-              <Activity className="w-6 h-6 text-primary" />
+              <img src={logo} alt="BOCH Logo" className="h-8 w-auto" />
               <h1 className="text-xl font-bold text-gradient">BOCH Dashboard</h1>
             </div>
 
@@ -443,7 +444,7 @@ export function Dashboard() {
         {/* Watch Grid */}
         {isConnected && watches.length === 0 && !isLoading && (
           <div className="text-center py-16">
-            <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <img src={logo} alt="BOCH Logo" className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <h3 className="text-lg font-medium mb-2">No watches added</h3>
             <p className="text-muted-foreground mb-4">
               Create your first watch to start monitoring your endpoints
