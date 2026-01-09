@@ -6,6 +6,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  ReferenceLine,
 } from 'recharts';
 import type { History } from '@/types/api';
 import { format } from 'date-fns';
@@ -244,6 +245,25 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
                 wrapperStyle={{ zIndex: 9999, pointerEvents: 'none' }}
                 allowEscapeViewBox={{ x: true, y: true }}
               />
+              {/* Reference lines for thresholds */}
+              {YELLOW_THRESHOLD >= minResponse && YELLOW_THRESHOLD <= maxResponse && (
+                <ReferenceLine
+                  y={YELLOW_THRESHOLD}
+                  stroke="hsl(var(--stoplight-yellow))"
+                  strokeWidth={1}
+                  strokeOpacity={0.4}
+                  strokeDasharray="4 4"
+                />
+              )}
+              {RED_THRESHOLD >= minResponse && RED_THRESHOLD <= maxResponse && (
+                <ReferenceLine
+                  y={RED_THRESHOLD}
+                  stroke="hsl(var(--stoplight-red))"
+                  strokeWidth={1}
+                  strokeOpacity={0.4}
+                  strokeDasharray="4 4"
+                />
+              )}
               <Area
                 type="monotone"
                 dataKey="responseTimeMs"
