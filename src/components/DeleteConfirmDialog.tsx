@@ -28,9 +28,9 @@ export function DeleteConfirmDialog({
     <AlertDialog open={open} onOpenChange={(o) => !o && onCancel()}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Watch</AlertDialogTitle>
+          <AlertDialogTitle>Deactivate Watch</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete <strong>"{watchName}"</strong>? This action cannot be undone and all history data will be lost.
+            Are you sure you want to deactivate <strong>"{watchName}"</strong>? The watch will be marked as inactive and hidden by default.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -40,7 +40,7 @@ export function DeleteConfirmDialog({
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? 'Deleting...' : 'Delete'}
+            {isLoading ? 'Deactivating...' : 'Deactivate'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
