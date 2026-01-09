@@ -180,22 +180,28 @@ export function Dashboard() {
     await refreshData();
   };
 
-  const handleToggleWatch = async (watch: Watch) => {
+  const handleToggleActiveClick = (watch: Watch) => {
+    if (watch.active) {
+      // Deactivating - show confirmation
+      setDeletingWatch(watch.name);
+      setDeleteDialogOpen(true);
+    } else {
+      // Activating - do it directly
+      handleActivateWatch(watch);
+    }
+  };
+
+  const handleActivateWatch = async (watch: Watch) => {
     try {
-      await updateWatch(apiKey, watch.name, { active: !watch.active });
+      await updateWatch(apiKey, watch.name, { active: true });
       await refreshData();
     } catch (err) {
       toast({
         title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to toggle watch',
+        description: err instanceof Error ? err.message : 'Failed to activate watch',
         variant: 'destructive',
       });
     }
-  };
-
-  const handleDeleteClick = (watchName: string) => {
-    setDeletingWatch(watchName);
-    setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -485,7 +491,7 @@ export function Dashboard() {
         open={watchDialogOpen}
         onClose={() => setWatchDialogOpen(false)}
         onSave={handleSaveWatch}
-        onDelete={handleDeleteClick}
+        onToggleActive={handleToggleActiveClick}
         watch={editingWatch}
       />
 
