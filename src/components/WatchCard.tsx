@@ -110,7 +110,8 @@ export function WatchCard({
         'glass-card transition-all duration-300 animate-fade-in relative z-0 hover:z-50',
         isLoading && 'card-loading',
         isDragging && 'opacity-50 scale-[0.98]',
-        isGhost && 'ring-2 ring-primary/50 ring-dashed'
+        isGhost && 'ring-2 ring-primary/50 ring-dashed',
+        !active && 'opacity-50 grayscale-[30%] border-dashed'
       )}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
