@@ -21,30 +21,59 @@ function hasMixedStatusCodes(statusSummary: Record<number, number>): boolean {
   return has2xx && hasNon2xx;
 }
 
+export interface WatchStatusResult {
+  status: StoplightStatus;
+  p95: number | null;
+  reason: string;
+}
+
 export function calculateWatchStatus(
   summary?: HistorySummaryResponse,
   history?: History[]
 ): StoplightStatus {
+  return calculateWatchStatusWithDetails(summary, history).status;
+}
+
+export function calculateWatchStatusWithDetails(
+  summary?: HistorySummaryResponse,
+  history?: History[]
+): WatchStatusResult {
   // No history records → grey
   if (!summary || summary.histroyRecordCount === 0) {
-    return 'grey';
+    return { status: 'grey', p95: null, reason: 'No data' };
   }
 
   const responseTimes = history?.map((h) => h.responseTimeMs) || [];
   const p95 = responseTimes.length > 0 ? calculateP95(responseTimes) : summary.responseTime.avg;
 
-  // Check for failed responses (4xx, 5xx, or 0) or extreme latency
-  if (hasFailedResponses(summary.statusSummary) || p95 >= 2000) {
-    return 'red';
+  // Check for failed responses (4xx, 5xx, or 0)
+  if (hasFailedResponses(summary.statusSummary)) {
+    const errorCodes = Object.keys(summary.statusSummary)
+      .filter(code => {
+        const numCode = parseInt(code, 10);
+        return numCode >= 400 || numCode === 0;
+      })
+      .join(', ');
+    return { status: 'red', p95, reason: `Error responses: ${errorCodes}` };
   }
 
-  // Check for high latency or mixed status codes
-  if (p95 >= 500 || hasMixedStatusCodes(summary.statusSummary)) {
-    return 'yellow';
+  // Check for extreme latency
+  if (p95 >= 2000) {
+    return { status: 'red', p95, reason: `P95: ${Math.round(p95).toLocaleString()} ms` };
+  }
+
+  // Check for high latency
+  if (p95 >= 500) {
+    return { status: 'yellow', p95, reason: `P95: ${Math.round(p95).toLocaleString()} ms` };
+  }
+
+  // Check for mixed status codes
+  if (hasMixedStatusCodes(summary.statusSummary)) {
+    return { status: 'yellow', p95, reason: 'Mixed status codes' };
   }
 
   // All good: P95 < 500ms and all 2xx
-  return 'green';
+  return { status: 'green', p95, reason: `P95: ${Math.round(p95).toLocaleString()} ms` };
 }
 
 export function calculateGlobalStatus(statuses: StoplightStatus[]): StoplightStatus {

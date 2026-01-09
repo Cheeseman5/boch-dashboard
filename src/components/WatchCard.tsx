@@ -12,7 +12,7 @@ import { Stoplight } from './Stoplight';
 import { ResponseTimeGraph } from './ResponseTimeGraph';
 import type { WatchWithData, HistoryFilter, HistorySummaryResponse } from '@/types/api';
 import { cn } from '@/lib/utils';
-import { calculateWatchStatus } from '@/lib/stoplight';
+import { calculateWatchStatusWithDetails } from '@/lib/stoplight';
 
 const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] = [
   { value: 30, label: '30' },
@@ -73,7 +73,7 @@ export function WatchCard({
       }
     : summary;
 
-  const status = calculateWatchStatus(filteredSummary, filteredHistory);
+  const { status, reason: statusReason } = calculateWatchStatusWithDetails(filteredSummary, filteredHistory);
 
   // Calculate metrics from filtered data, or use summary when 'all'
   const metrics = (() => {
@@ -129,7 +129,7 @@ export function WatchCard({
 
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-1 pt-5 px-3">
         <div className="flex items-center gap-2 min-w-0">
-          <Stoplight status={status} animate={!isLoading && status !== 'grey'} />
+          <Stoplight status={status} animate={!isLoading && status !== 'grey'} tooltip={statusReason} />
           <div className="min-w-0">
             <h3 className="font-semibold truncate">{name}</h3>
             <p className="text-xs text-muted-foreground font-mono truncate max-w-[200px]">
