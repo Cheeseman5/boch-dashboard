@@ -177,7 +177,7 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
   };
 
   return (
-    <div className="h-full w-full min-h-[100px] flex flex-col overflow-hidden">
+    <div className="h-full w-full min-h-[100px] flex flex-col overflow-visible">
       <div className="flex-1 min-h-0 flex">
         {/* Y-axis labels on left */}
         <div className="flex flex-col justify-between items-end pr-1 py-1 shrink-0">
@@ -214,7 +214,12 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip 
+                content={<CustomTooltip />} 
+                wrapperStyle={{ zIndex: 50 }}
+                position={{ y: 110 }}
+                allowEscapeViewBox={{ x: true, y: true }}
+              />
               <Area
                 type="monotone"
                 dataKey="responseTimeMs"
