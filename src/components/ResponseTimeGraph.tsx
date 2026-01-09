@@ -20,12 +20,14 @@ interface BucketData {
   endDateTime: string;
   responseTimeMs: number;
   count: number;
+  statusSummary: Record<number, number>;
 }
 
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: BucketData }> }) {
   if (!active || !payload || !payload.length) return null;
 
   const data = payload[0].payload;
+  const statusEntries = Object.entries(data.statusSummary).sort(([a], [b]) => parseInt(a) - parseInt(b));
 
   return (
     <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
@@ -36,8 +38,25 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
         → {format(new Date(data.endDateTime), 'MMM d, HH:mm:ss')}
       </p>
       <p className="text-sm font-medium">
-        P95: {data.responseTimeMs}ms
+        P95: {data.responseTimeMs.toLocaleString()}ms
       </p>
+      {statusEntries.length > 0 && (
+        <div className="flex flex-wrap gap-x-2 gap-y-0.5 my-1">
+          {statusEntries.map(([code, count]) => {
+            const numCode = parseInt(code, 10);
+            const isError = numCode >= 400 || numCode === 0;
+            const isSuccess = numCode >= 200 && numCode < 300;
+            return (
+              <span key={code} className="text-xs font-mono">
+                <span className={isError ? 'text-red-500' : isSuccess ? 'text-green-500' : 'text-yellow-500'}>
+                  {code}
+                </span>
+                <span className="text-muted-foreground">×{count}</span>
+              </span>
+            );
+          })}
+        </div>
+      )}
       <p className="text-xs text-muted-foreground">
         {data.count} request{data.count !== 1 ? 's' : ''}
       </p>
@@ -90,11 +109,17 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
     if (bucket.length === 0) continue;
     
     const responseTimes = bucket.map((h) => h.responseTimeMs);
+    const statusSummary = bucket.reduce((acc, h) => {
+      acc[h.statusCode] = (acc[h.statusCode] || 0) + 1;
+      return acc;
+    }, {} as Record<number, number>);
+    
     chartData.push({
       startDateTime: bucket[0].dateTime,
       endDateTime: bucket[bucket.length - 1].dateTime,
       responseTimeMs: calculateP95(responseTimes),
       count: bucket.length,
+      statusSummary,
     });
   }
 
