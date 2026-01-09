@@ -213,7 +213,7 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
         </div>
         
         {/* Chart area */}
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 border-b border-border/50 shadow-[0_1px_2px_-1px_rgba(0,0,0,0.1)]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
               <defs>
