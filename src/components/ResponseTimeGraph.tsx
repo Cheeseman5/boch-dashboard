@@ -216,7 +216,7 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
               />
               <Tooltip 
                 content={<CustomTooltip />} 
-                wrapperStyle={{ zIndex: 1000 }}
+                wrapperStyle={{ zIndex: 9999, pointerEvents: 'none' }}
                 allowEscapeViewBox={{ x: true, y: true }}
               />
               <Area

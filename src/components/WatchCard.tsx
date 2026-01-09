@@ -107,7 +107,7 @@ export function WatchCard({
   return (
     <Card 
       className={cn(
-        'glass-card transition-all duration-300 animate-fade-in relative',
+        'glass-card transition-all duration-300 animate-fade-in relative z-0 hover:z-50',
         isLoading && 'card-loading',
         isDragging && 'opacity-50 scale-[0.98]',
         isGhost && 'ring-2 ring-primary/50 ring-dashed'
