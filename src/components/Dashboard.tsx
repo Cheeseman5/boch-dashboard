@@ -346,7 +346,7 @@ export function Dashboard() {
             {/* Logo & Title */}
             <div className="flex items-center gap-2 shrink-0">
               <img src={logo} alt="BOCH Logo" className="h-8 w-auto" />
-              <h1 className="text-xl font-bold text-gradient">BOCH Dashboard</h1>
+              <h1 className="text-xl font-bold text-foreground">BOCH Dashboard</h1>
             </div>
 
             {/* API Key Menu */}
