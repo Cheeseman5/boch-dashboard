@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Power } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -11,18 +11,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+
 import type { Watch, AddWatchRequest, UpdateWatchRequest } from '@/types/api';
 
 interface WatchDialogProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: AddWatchRequest | UpdateWatchRequest, originalName?: string) => Promise<void>;
-  onDelete?: (name: string) => void;
+  onToggleActive?: (watch: Watch) => void;
   watch?: Watch;
 }
 
-export function WatchDialog({ open, onClose, onSave, onDelete, watch }: WatchDialogProps) {
+export function WatchDialog({ open, onClose, onSave, onToggleActive, watch }: WatchDialogProps) {
   const isEdit = !!watch;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -138,16 +138,6 @@ export function WatchDialog({ open, onClose, onSave, onDelete, watch }: WatchDia
             />
           </div>
 
-          {isEdit && (
-            <div className="flex items-center justify-between">
-              <Label htmlFor="active">Active</Label>
-              <Switch
-                id="active"
-                checked={active}
-                onCheckedChange={setActive}
-              />
-            </div>
-          )}
 
           {error && (
             <p className="text-sm text-destructive">{error}</p>
@@ -155,18 +145,30 @@ export function WatchDialog({ open, onClose, onSave, onDelete, watch }: WatchDia
 
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <div className="flex-1">
-            {isEdit && onDelete && watch.active && (
+            {isEdit && onToggleActive && (
                 <Button 
                   type="button" 
                   variant="ghost" 
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  className={watch.active 
+                    ? "text-destructive hover:text-destructive hover:bg-destructive/10"
+                    : "text-green-600 hover:text-green-600 hover:bg-green-600/10"
+                  }
                   onClick={() => {
-                    onDelete(watch.name);
+                    onToggleActive(watch);
                     onClose();
                   }}
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Deactivate
+                  {watch.active ? (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Deactivate
+                    </>
+                  ) : (
+                    <>
+                      <Power className="w-4 h-4 mr-2" />
+                      Activate
+                    </>
+                  )}
                 </Button>
               )}
             </div>
