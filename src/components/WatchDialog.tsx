@@ -155,7 +155,7 @@ export function WatchDialog({ open, onClose, onSave, onDelete, watch }: WatchDia
 
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <div className="flex-1">
-              {isEdit && onDelete && (
+            {isEdit && onDelete && watch.active && (
                 <Button 
                   type="button" 
                   variant="ghost" 
@@ -166,7 +166,7 @@ export function WatchDialog({ open, onClose, onSave, onDelete, watch }: WatchDia
                   }}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                  Deactivate
                 </Button>
               )}
             </div>
