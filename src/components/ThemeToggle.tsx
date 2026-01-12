@@ -1,31 +1,23 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const { resolvedTheme, theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  // Keep internal state and the DOM in sync with next-themes when it resolves.
-  useEffect(() => {
-    if (!resolvedTheme) return;
-    const nextIsDark = resolvedTheme === 'dark';
-    setIsDark(nextIsDark);
-    document.documentElement.classList.toggle('dark', nextIsDark);
-  }, [resolvedTheme]);
+  useEffect(() => setMounted(true), []);
 
-  const handleToggle = useCallback(() => {
-    const nextIsDark = !document.documentElement.classList.contains('dark');
-    document.documentElement.classList.toggle('dark', nextIsDark);
-    setIsDark(nextIsDark);
-    setTheme(nextIsDark ? 'dark' : 'light');
-  }, [setTheme]);
+  const currentTheme = useMemo(() => {
+    // resolvedTheme is the one that matters for "system".
+    // Before mount it can be undefined; we avoid relying on it to prevent mismatches.
+    if (!mounted) return 'dark';
+    return resolvedTheme ?? theme ?? 'dark';
+  }, [mounted, resolvedTheme, theme]);
+
+  const isDark = currentTheme === 'dark';
 
   return (
     <Tooltip>
@@ -33,7 +25,7 @@ export function ThemeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={handleToggle}
+          onClick={() => setTheme(isDark ? 'light' : 'dark')}
           className="shrink-0"
         >
           <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -47,4 +39,5 @@ export function ThemeToggle() {
     </Tooltip>
   );
 }
+
 
