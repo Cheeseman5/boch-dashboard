@@ -6,6 +6,66 @@
 
 @layer base {
   :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 199 89% 48%;
+
+    --radius: 0.75rem;
+
+    /* Stoplight colors */
+    --stoplight-green: 142 71% 45%;
+    --stoplight-yellow: 45 93% 47%;
+    --stoplight-red: 0 84% 60%;
+    --stoplight-grey: 220 9% 46%;
+
+    /* Graph colors */
+    --graph-line: 199 89% 48%;
+    --graph-area: 199 89% 48%;
+    --graph-success: 142 71% 45%;
+    --graph-warning: 45 93% 47%;
+    --graph-error: 0 84% 60%;
+
+    /* Glow effects */
+    --glow-green: 0 0 20px hsl(142 71% 45% / 0.4);
+    --glow-yellow: 0 0 20px hsl(45 93% 47% / 0.4);
+    --glow-red: 0 0 20px hsl(0 84% 60% / 0.4);
+    --glow-primary: 0 0 30px hsl(199 89% 48% / 0.3);
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 199 89% 48%;
+  }
+
+  .dark {
     --background: 222 47% 6%;
     --foreground: 210 40% 98%;
 
@@ -33,8 +93,6 @@
     --border: 222 47% 16%;
     --input: 222 47% 14%;
     --ring: 199 89% 48%;
-
-    --radius: 0.75rem;
 
     /* Stoplight colors */
     --stoplight-green: 142 71% 45%;

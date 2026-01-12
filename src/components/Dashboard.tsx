@@ -10,6 +10,7 @@ import { GlobalHealth } from './GlobalHealth';
 import { WatchCard } from './WatchCard';
 import { WatchDialog } from './WatchDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { ThemeToggle } from './ThemeToggle';
 import {
   getWatches,
   getHistory,
@@ -355,13 +356,14 @@ export function Dashboard() {
               <h1 className="text-xl font-bold text-foreground">BOCH Dashboard</h1>
             </div>
 
-            {/* API Key Menu */}
-            <div className="flex items-center gap-3">
+            {/* Actions */}
+            <div className="flex items-center gap-2">
               {apiKey && (
                 <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
                   Key: ...{apiKey.slice(-5)}
                 </span>
               )}
+              <ThemeToggle />
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="icon" className="shrink-0">
