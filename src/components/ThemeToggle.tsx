@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/tooltip';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   return (
     <TooltipProvider>
@@ -18,7 +18,7 @@ export function ThemeToggle() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
             className="shrink-0"
           >
             <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -27,7 +27,7 @@ export function ThemeToggle() {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p className="text-xs">{theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}</p>
+          <p className="text-xs">{resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
