@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -19,15 +19,24 @@ export function ThemeToggle() {
 
   const isDark = currentTheme === 'dark';
 
+  const handleToggle = useCallback(() => {
+    const nextTheme = isDark ? 'light' : 'dark';
+
+    // Primary: tell next-themes to switch.
+    setTheme(nextTheme);
+
+    // Fallback: hard-sync the DOM class so Tailwind + CSS vars switch even if next-themes
+    // isn't applying the attribute for some reason.
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.toggle('dark', nextTheme === 'dark');
+      document.documentElement.classList.toggle('light', nextTheme === 'light');
+    }
+  }, [isDark, setTheme]);
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(isDark ? 'light' : 'dark')}
-          className="shrink-0"
-        >
+        <Button type="button" variant="ghost" size="icon" onClick={handleToggle} className="shrink-0">
           <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
