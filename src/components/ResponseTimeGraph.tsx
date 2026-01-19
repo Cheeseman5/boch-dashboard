@@ -22,6 +22,7 @@ interface BucketData {
   responseTimeMs: number;
   count: number;
   statusSummary: Record<number, number>;
+  hasErrors: boolean;
 }
 
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: BucketData }> }) {
@@ -114,6 +115,9 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
       acc[h.statusCode] = (acc[h.statusCode] || 0) + 1;
       return acc;
     }, {} as Record<number, number>);
+
+    // Check if any status code in this bucket is an error (4xx, 5xx, or 0)
+    const hasErrors = bucket.some((h) => h.statusCode >= 400 || h.statusCode === 0);
     
     chartData.push({
       startDateTime: bucket[0].dateTime,
@@ -121,6 +125,7 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
       responseTimeMs: calculateP95(responseTimes),
       count: bucket.length,
       statusSummary,
+      hasErrors,
     });
   }
 
@@ -277,7 +282,20 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
                 stroke={getStrokeColor()}
                 strokeWidth={2}
                 fill={`url(#fillGradient-${chartId})`}
-                dot={false}
+                dot={(props: { cx?: number; cy?: number; payload?: BucketData }) => {
+                  const { cx, cy, payload } = props;
+                  if (!payload?.hasErrors || cx === undefined || cy === undefined) return <g />;
+                  return (
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={4}
+                      fill="hsl(var(--stoplight-red))"
+                      stroke="hsl(var(--background))"
+                      strokeWidth={1.5}
+                    />
+                  );
+                }}
                 activeDot={{ r: 4, fill: 'hsl(var(--graph-line))' }}
               />
             </AreaChart>
