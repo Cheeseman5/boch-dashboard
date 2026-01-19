@@ -43,7 +43,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
         P95: {data.responseTimeMs.toLocaleString()}ms
       </p>
       {statusEntries.length > 0 && (
-        <div className="flex flex-wrap gap-x-2 gap-y-0.5 my-1">
+        <div className="flex flex-col gap-0.5 my-1">
           {statusEntries.map(([code, count]) => {
             const numCode = parseInt(code, 10);
             const isError = numCode >= 400 || numCode === 0;
@@ -53,7 +53,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
                 <span className={isError ? 'text-red-500' : isSuccess ? 'text-green-500' : 'text-yellow-500'}>
                   {code}
                 </span>
-                <span className="text-muted-foreground">×{count}</span>
+                <span className="text-muted-foreground"> × {count}</span>
               </span>
             );
           })}
