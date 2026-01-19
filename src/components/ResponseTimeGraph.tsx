@@ -289,14 +289,27 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
                     <circle
                       cx={cx}
                       cy={cy}
-                      r={4}
+                      r={2}
                       fill="hsl(var(--stoplight-red))"
+                      fillOpacity={0.5}
+                    />
+                  );
+                }}
+                activeDot={(props: { cx?: number; cy?: number; payload?: BucketData }) => {
+                  const { cx, cy, payload } = props;
+                  if (cx === undefined || cy === undefined) return <g />;
+                  const isError = payload?.hasErrors;
+                  return (
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={4}
+                      fill={isError ? 'hsl(var(--stoplight-red))' : 'hsl(var(--graph-line))'}
                       stroke="hsl(var(--background))"
                       strokeWidth={1.5}
                     />
                   );
                 }}
-                activeDot={{ r: 4, fill: 'hsl(var(--graph-line))' }}
               />
             </AreaChart>
           </ResponsiveContainer>
