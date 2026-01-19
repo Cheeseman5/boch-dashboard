@@ -289,7 +289,7 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
                     <circle
                       cx={cx}
                       cy={cy}
-                      r={2}
+                      r={4}
                       fill="hsl(var(--stoplight-red))"
                       fillOpacity={0.5}
                     />
