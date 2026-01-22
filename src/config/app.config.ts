@@ -39,3 +39,31 @@ export const STOPLIGHT_THRESHOLDS = {
   /** P95 response time (ms) that triggers YELLOW status */
   warningLatencyMs: 1000,
 } as const;
+
+// ============================================================================
+// GLOBAL SUMMARY BEHAVIOR
+// ============================================================================
+// Controls how the global health status section behaves.
+
+/**
+ * Global status scope: determines which data drives the global status
+ * - 'default': Uses all data from watches (not affected by per-card filters)
+ * - 'filtered': Global status changes to match the currently viewed/filtered state
+ */
+export type GlobalStatusScope = 'default' | 'filtered';
+
+/**
+ * Inactive watch inclusion: determines if inactive watches count in global summary
+ * - 'always': Always include inactive watches in global health
+ * - 'never': Never include inactive watches in global health
+ * - 'dynamic': Only include inactive watches if showInactive toggle is enabled
+ */
+export type InactiveWatchInclusion = 'always' | 'never' | 'dynamic';
+
+export const GLOBAL_SUMMARY_SETTINGS = {
+  /** Which data scope to use for global status calculation */
+  statusScope: 'default' as GlobalStatusScope,
+
+  /** How to handle inactive watches in global health counts */
+  inactiveWatchInclusion: 'never' as InactiveWatchInclusion,
+} as const;
