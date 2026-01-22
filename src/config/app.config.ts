@@ -88,4 +88,12 @@ export const STOPLIGHT_ANIMATION_SETTINGS = {
 
   /** Animation speed in seconds (lower = faster) */
   strobeSpeedSeconds: 0.5,
+
+  /** Which status states should strobe (true = strobe enabled) */
+  strobeStates: {
+    red: true,
+    yellow: true,
+    green: false,
+    grey: false,
+  },
 } as const;

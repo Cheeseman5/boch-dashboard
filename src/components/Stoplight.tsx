@@ -33,8 +33,8 @@ export function Stoplight({
   };
 
   // Determine if this stoplight should animate based on config
-  const { strobeScope, strobeSpeedSeconds } = STOPLIGHT_ANIMATION_SETTINGS;
-  const shouldAnimate = animate && (status === 'red' || status === 'yellow') && (() => {
+  const { strobeScope, strobeSpeedSeconds, strobeStates } = STOPLIGHT_ANIMATION_SETTINGS;
+  const shouldAnimate = animate && strobeStates[status] && (() => {
     if (strobeScope === 'none') return false;
     if (strobeScope === 'all') return true;
     if (strobeScope === 'watches' && context === 'watch') return true;
