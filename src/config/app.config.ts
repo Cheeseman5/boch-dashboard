@@ -18,6 +18,7 @@ export const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] =
   { value: 30, label: "30" },
   { value: 90, label: "90" },
   { value: 180, label: "180" },
+  { value: 400, label: "400" },
   { value: "all", label: "All" },
 ];
 
@@ -34,7 +35,7 @@ export const DEFAULT_HISTORY_FILTER: HistoryFilter = 30;
 
 export const STOPLIGHT_THRESHOLDS = {
   /** P95 response time (ms) that triggers RED status */
-  criticalLatencyMs: 2000,
+  criticalLatencyMs: 3000,
 
   /** P95 response time (ms) that triggers YELLOW status */
   warningLatencyMs: 1000,
