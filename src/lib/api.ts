@@ -31,11 +31,6 @@ async function apiRequest<T>(
   apiKey: string,
   options: RequestInit = {}
 ): Promise<T> {
-  if (import.meta.env.DEV) {
-    // Never log API keys; endpoint is enough to confirm what watch name is being requested.
-    console.debug('[boch] request', endpoint);
-  }
-
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers: {
