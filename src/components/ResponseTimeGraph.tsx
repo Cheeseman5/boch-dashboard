@@ -97,11 +97,6 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
   );
   
-  if (import.meta.env.DEV) {
-    console.debug('[ResponseTimeGraph] Rendering with', history.length, 'records')
-  }
-
-
   // Group into max 90 buckets
   const maxBuckets = 90;
   const bucketSize = Math.ceil(sortedHistory.length / maxBuckets);
