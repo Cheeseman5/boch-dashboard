@@ -43,7 +43,7 @@ export type PercentileValue = number;
 
 export const STOPLIGHT_THRESHOLDS = {
   /** Which percentile to use for latency calculations (e.g., 95 = P95). Any value 1-100. */
-  percentile: 95 as PercentileValue,
+  percentile: 50 as PercentileValue,
 
   /** Percentile response time (ms) that triggers RED status */
   criticalLatencyMs: 3000,
