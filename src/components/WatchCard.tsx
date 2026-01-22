@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Pencil, GripHorizontal, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +19,7 @@ interface WatchCardProps {
   watch: WatchWithData;
   historyFilter: HistoryFilter;
   onHistoryFilterChange: (filter: HistoryFilter) => void;
+  onStatusChange?: (watchName: string, status: import('@/types/api').StoplightStatus) => void;
   onEdit: () => void;
   isDragging?: boolean;
   isGhost?: boolean;
@@ -32,6 +34,7 @@ export function WatchCard({
   watch, 
   historyFilter,
   onHistoryFilterChange,
+  onStatusChange,
   onEdit,
   isDragging,
   isGhost,
@@ -68,6 +71,13 @@ export function WatchCard({
     : summary;
 
   const { status, reason: statusReason } = calculateWatchStatusWithDetails(filteredSummary, filteredHistory);
+
+  // Notify parent of filtered status changes for global health calculation
+  useEffect(() => {
+    if (onStatusChange) {
+      onStatusChange(name, status);
+    }
+  }, [name, status, onStatusChange]);
 
   // Calculate metrics from filtered data, or use summary when 'all'
   const metrics = (() => {
