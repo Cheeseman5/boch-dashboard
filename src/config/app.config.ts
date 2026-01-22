@@ -65,5 +65,5 @@ export const GLOBAL_SUMMARY_SETTINGS = {
   statusScope: "filtered" as GlobalStatusScope,
 
   /** How to handle inactive watches in global health counts */
-  inactiveWatchInclusion: "dynamic" as InactiveWatchInclusion,
+  inactiveWatchInclusion: "never" as InactiveWatchInclusion,
 } as const;
