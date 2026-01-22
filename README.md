@@ -1,73 +1,186 @@
-# Welcome to your Lovable project
+# BOCH API Dashboard
 
-## Project info
+A real-time system health monitoring dashboard integrated with the BOCH API via RapidAPI. Features a professional, high-density interface with dark and light theme support.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+![Dashboard Preview](src/assets/logo.png)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Quick Setup
 
-**Use Lovable**
+### Prerequisites
+- Node.js 18+ (or Bun)
+- A valid RapidAPI key with BOCH API access
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### Installation
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
+# Clone the repository
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
+# or
+bun install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
+# or
+bun dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### First Run
 
-**Use GitHub Codespaces**
+1. Launch the dashboard
+2. Click the **key icon** in the top navigation bar
+3. Enter your `X-RapidApi-Key` or `X-RapidApi-User` key
+4. Click **Connect** to load your watches
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## Features
 
-This project is built with:
+### Core Functionality
+- **Real-time Watch Monitoring** — View all configured watches with live status indicators
+- **Stoplight Status System** — Green/Yellow/Red/Grey indicators based on response latency thresholds
+- **Global Health Summary** — Aggregated status across all watches
+- **Response Time Graphs** — Historical latency visualization per watch
+- **History Filtering** — Filter data by time range (7, 14, 30, 60, 90 days, or all)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### User Interface
+- **Dark/Light Theme** — Toggle between themes (persisted in localStorage)
+- **Drag & Drop Reordering** — Customize watch card arrangement
+- **Responsive Layout** — Works on desktop and tablet screens
+- **Watch Management** — Add, edit, activate/deactivate, and delete watches
 
-## How can I deploy this project?
+### Data Display
+- **Uptime Percentage** — Calculated from historical checks
+- **Average Response Time** — Mean latency over filtered period
+- **Last Check Status** — Most recent check result with timestamp
+- **Trend Indicators** — Visual cues for performance direction
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## Customization
 
-Yes, you can!
+All configuration is centralized in `src/config/app.config.ts`:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Stoplight Thresholds
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```typescript
+export const STOPLIGHT_THRESHOLDS = {
+  percentile: 95,              // Percentile for latency calculation
+  criticalLatencyMs: 3000,     // Red light threshold (ms)
+  warningLatencyMs: 1000,      // Yellow light threshold (ms)
+  graphAggregation: "percentile",
+  watchStatusScope: "total",
+  summaryMetricsScope: "total"
+};
+```
+
+### History Filter Options
+
+```typescript
+export const HISTORY_FILTER_OPTIONS = [
+  { value: 7, label: "Last 7 days" },
+  { value: 14, label: "Last 14 days" },
+  { value: 30, label: "Last 30 days" },
+  { value: 60, label: "Last 60 days" },
+  { value: 90, label: "Last 90 days" },
+  { value: "all", label: "All time" },
+];
+
+export const DEFAULT_HISTORY_FILTER = 30;
+```
+
+### Global Summary Settings
+
+```typescript
+export const GLOBAL_SUMMARY_SETTINGS = {
+  statusScope: "default",           // "default" | "filtered"
+  inactiveWatchInclusion: "never"   // "always" | "never" | "dynamic"
+};
+```
+
+### Stoplight Animation
+
+```typescript
+export const STOPLIGHT_ANIMATION_SETTINGS = {
+  strobeScope: "all",          // "all" | "watches" | "summary" | "none"
+  strokeSpeedSeconds: 0.5,
+  strokeStates: {
+    red: true,
+    yellow: true,
+    green: false,
+    grey: false
+  }
+};
+```
+
+---
+
+## Theming
+
+CSS variables are defined in `src/index.css`. Both light and dark themes are fully customizable:
+
+### Key Color Tokens
+
+| Token | Purpose |
+|-------|---------|
+| `--background` | Page background |
+| `--foreground` | Primary text |
+| `--primary` | Accent color (buttons, links) |
+| `--card` | Card backgrounds |
+| `--muted` | Subtle backgrounds |
+| `--stoplight-green/yellow/red` | Status indicators |
+| `--graph-line/area` | Chart colors |
+
+### Adding Custom Colors
+
+1. Define the HSL values in `src/index.css` under `:root` and `.dark`
+2. Add to `tailwind.config.ts` under `theme.extend.colors`
+3. Use in components via Tailwind classes
+
+---
+
+## Tech Stack
+
+- **React 18** — UI framework
+- **Vite** — Build tool
+- **TypeScript** — Type safety
+- **Tailwind CSS** — Styling
+- **shadcn/ui** — Component library
+- **Recharts** — Data visualization
+- **next-themes** — Theme management
+- **TanStack Query** — Data fetching
+
+---
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── ui/              # shadcn/ui components
+│   ├── Dashboard.tsx    # Main dashboard view
+│   ├── WatchCard.tsx    # Individual watch display
+│   ├── GlobalHealth.tsx # Summary health indicator
+│   └── ...
+├── config/
+│   └── app.config.ts    # Centralized configuration
+├── lib/
+│   ├── api.ts           # API client
+│   └── stoplight.ts     # Status calculation logic
+├── types/
+│   └── api.ts           # TypeScript interfaces
+└── index.css            # Design tokens & global styles
+```
+
+---
+
+## License
+
+MIT
