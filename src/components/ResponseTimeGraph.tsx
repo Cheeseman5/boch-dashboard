@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import type { History } from '@/types/api';
 import { format } from 'date-fns';
+import { STOPLIGHT_THRESHOLDS } from '@/config/app.config';
 
 interface ResponseTimeGraphProps {
   history: History[];
@@ -137,9 +138,9 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
   const firstDate = chartData[0]?.startDateTime;
   const lastDate = chartData[chartData.length - 1]?.endDateTime;
 
-  // Threshold values for color changes
-  const YELLOW_THRESHOLD = 500;
-  const RED_THRESHOLD = 2000;
+  // Threshold values from centralized config
+  const YELLOW_THRESHOLD = STOPLIGHT_THRESHOLDS.warningLatencyMs;
+  const RED_THRESHOLD = STOPLIGHT_THRESHOLDS.criticalLatencyMs;
 
   // Calculate gradient stops based on thresholds
   // Y-axis goes from top (max) to bottom (min), so we need to invert the percentages
