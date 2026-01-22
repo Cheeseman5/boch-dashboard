@@ -1,5 +1,5 @@
 import type { History, HistorySummaryResponse, StoplightStatus } from '@/types/api';
-import { STOPLIGHT_THRESHOLDS, type PercentileValue } from '@/config/app.config';
+import { STOPLIGHT_THRESHOLDS, type PercentileValue, type GraphAggregationMethod } from '@/config/app.config';
 
 /**
  * Calculate the Nth percentile of response times.
@@ -16,6 +16,40 @@ function calculatePercentile(responseTimes: number[], percentile: PercentileValu
 /** Get the display label for the configured percentile (e.g., "P95", "P99") */
 export function getPercentileLabel(): string {
   return `P${STOPLIGHT_THRESHOLDS.percentile}`;
+}
+
+/** Get the display label for the current graph aggregation method */
+export function getAggregationLabel(): string {
+  const method = STOPLIGHT_THRESHOLDS.graphAggregation;
+  switch (method) {
+    case 'max': return 'Max';
+    case 'min': return 'Min';
+    case 'avg': return 'Avg';
+    case 'percentile': return getPercentileLabel();
+  }
+}
+
+/**
+ * Aggregate an array of response times based on the configured method.
+ * @param responseTimes - Array of response times in ms
+ * @param method - Optional override for the aggregation method (defaults to config value)
+ */
+export function aggregateResponseTimes(
+  responseTimes: number[],
+  method: GraphAggregationMethod = STOPLIGHT_THRESHOLDS.graphAggregation
+): number {
+  if (responseTimes.length === 0) return 0;
+  
+  switch (method) {
+    case 'max':
+      return Math.max(...responseTimes);
+    case 'min':
+      return Math.min(...responseTimes);
+    case 'avg':
+      return responseTimes.reduce((sum, t) => sum + t, 0) / responseTimes.length;
+    case 'percentile':
+      return calculatePercentile(responseTimes, STOPLIGHT_THRESHOLDS.percentile);
+  }
 }
 
 function hasFailedResponses(statusSummary: Record<number, number>): boolean {

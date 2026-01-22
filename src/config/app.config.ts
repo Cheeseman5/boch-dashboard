@@ -41,6 +41,16 @@ export const DEFAULT_HISTORY_FILTER: HistoryFilter = 30;
  */
 export type PercentileValue = number;
 
+/**
+ * Graph aggregation method for bucket calculations.
+ * Determines how each bucket's data point is calculated:
+ * - 'max': Use the maximum response time in the bucket
+ * - 'min': Use the minimum response time in the bucket
+ * - 'avg': Use the average response time in the bucket
+ * - 'percentile': Use the configured percentile value (from STOPLIGHT_THRESHOLDS.percentile)
+ */
+export type GraphAggregationMethod = 'max' | 'min' | 'avg' | 'percentile';
+
 export const STOPLIGHT_THRESHOLDS = {
   /** Which percentile to use for latency calculations (e.g., 95 = P95). Any value 1-100. */
   percentile: 50 as PercentileValue,
@@ -50,6 +60,9 @@ export const STOPLIGHT_THRESHOLDS = {
 
   /** Percentile response time (ms) that triggers YELLOW status */
   warningLatencyMs: 1000,
+
+  /** How to aggregate response times for each graph bucket */
+  graphAggregation: 'percentile' as GraphAggregationMethod,
 } as const;
 
 // ============================================================================
