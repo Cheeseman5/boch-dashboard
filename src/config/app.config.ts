@@ -49,11 +49,11 @@ export type PercentileValue = number;
  * - 'avg': Use the average response time in the bucket
  * - 'percentile': Use the configured percentile value (from STOPLIGHT_THRESHOLDS.percentile)
  */
-export type GraphAggregationMethod = 'max' | 'min' | 'avg' | 'percentile';
+export type GraphAggregationMethod = "max" | "min" | "avg" | "percentile";
 
 export const STOPLIGHT_THRESHOLDS = {
   /** Which percentile to use for latency calculations (e.g., 95 = P95). Any value 1-100. */
-  percentile: 50 as PercentileValue,
+  percentile: 90 as PercentileValue,
 
   /** Percentile response time (ms) that triggers RED status */
   criticalLatencyMs: 3000,
@@ -62,7 +62,7 @@ export const STOPLIGHT_THRESHOLDS = {
   warningLatencyMs: 1000,
 
   /** How to aggregate response times for each graph bucket */
-  graphAggregation: 'percentile' as GraphAggregationMethod,
+  graphAggregation: "percentile" as GraphAggregationMethod,
 } as const;
 
 // ============================================================================
