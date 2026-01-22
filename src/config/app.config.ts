@@ -84,7 +84,7 @@ export type StoplightStrobeScope = "all" | "watches" | "global" | "none";
 
 export const STOPLIGHT_ANIMATION_SETTINGS = {
   /** Which stoplights should strobe/pulse */
-  strobeScope: "watches" as StoplightStrobeScope,
+  strobeScope: "all" as StoplightStrobeScope,
 
   /** Animation speed in seconds (lower = faster) */
   strobeSpeedSeconds: 0.5,
