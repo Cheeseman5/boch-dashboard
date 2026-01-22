@@ -19,8 +19,30 @@ export function ThemeToggle() {
 
   const isDark = currentTheme === 'dark';
 
+  useEffect(() => {
+    if (!mounted) return;
+    // Debug: confirm next-themes state and DOM class are updating.
+    // eslint-disable-next-line no-console
+    console.debug('[ThemeToggle] theme changed', {
+      theme,
+      resolvedTheme,
+      currentTheme,
+      htmlClass: typeof document !== 'undefined' ? document.documentElement.className : undefined,
+    });
+  }, [mounted, theme, resolvedTheme, currentTheme]);
+
   const handleToggle = useCallback(() => {
     const nextTheme = isDark ? 'light' : 'dark';
+
+    // eslint-disable-next-line no-console
+    console.debug('[ThemeToggle] click', {
+      isDark,
+      nextTheme,
+      theme,
+      resolvedTheme,
+      currentTheme,
+      htmlClassBefore: typeof document !== 'undefined' ? document.documentElement.className : undefined,
+    });
 
     // Primary: tell next-themes to switch.
     setTheme(nextTheme);
@@ -30,8 +52,13 @@ export function ThemeToggle() {
     if (typeof document !== 'undefined') {
       document.documentElement.classList.toggle('dark', nextTheme === 'dark');
       document.documentElement.classList.toggle('light', nextTheme === 'light');
+
+      // eslint-disable-next-line no-console
+      console.debug('[ThemeToggle] after DOM class sync', {
+        htmlClassAfter: document.documentElement.className,
+      });
     }
-  }, [isDark, setTheme]);
+  }, [isDark, setTheme, theme, resolvedTheme, currentTheme]);
 
   return (
     <Tooltip>
