@@ -18,7 +18,7 @@ export const HISTORY_FILTER_OPTIONS = [
   { value: 180, label: "180" },
   { value: 400, label: "400" },
   { value: 1000, label: "1000" },
-  { value: 5000, label: "5000" },
+  { value: 5050, label: "5050" },
   { value: "all", label: "All" },
 ] as const;
 
