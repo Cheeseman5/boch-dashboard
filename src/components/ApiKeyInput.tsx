@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, EyeOff, Key } from 'lucide-react';
+import { Eye, EyeOff, Key, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -23,25 +23,42 @@ export function ApiKeyInput({ value, onChange, onSubmit, isLoading }: ApiKeyInpu
     }
   };
 
+  const handleClear = () => {
+    onChange('');
+  };
+
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className="relative">
         <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           type={showKey ? 'text' : 'password'}
-          placeholder="Enter your RapidAPI key"
+          placeholder="Your X-RapidApi-Key or X-RapidApi-User key"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="pl-10 pr-10 bg-input border-border font-mono text-sm"
+          className="pl-10 pr-16 bg-input border-border font-mono text-sm"
         />
-        <button
-          type="button"
-          onClick={() => setShowKey(!showKey)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-        </button>
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          {value && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Clear API key"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowKey(!showKey)}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={showKey ? 'Hide API key' : 'Show API key'}
+          >
+            {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
       <Button 
         onClick={onSubmit} 
