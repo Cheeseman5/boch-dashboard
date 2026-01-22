@@ -68,7 +68,8 @@ export interface Watch {
 
 export type StoplightStatus = 'green' | 'yellow' | 'red' | 'grey';
 
-export type HistoryFilter = 30 | 90 | 180 | 360 | 400 | 1000 | 5000 | 'all';
+// Re-exported from config for backward compatibility - config is the source of truth
+export type { HistoryFilter } from "@/config/app.config";
 
 export interface WatchWithData extends Watch {
   summary?: HistorySummaryResponse;
