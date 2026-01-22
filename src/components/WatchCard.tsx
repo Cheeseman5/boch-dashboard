@@ -53,22 +53,14 @@ export function WatchCard({
 
   // Handle click on graph data point - copy to clipboard
   const handleDataPointClick = async (data: BucketData) => {
-    const clipboardData = {
-      watchName: name,
-      timeRange: {
-        start: data.startDateTime,
-        end: data.endDateTime,
-      },
-      p95ResponseTimeMs: data.responseTimeMs,
-      requestCount: data.count,
-      statusCodes: data.statusSummary,
-    };
+    // Copy the individual watch response records as a JSON array
+    const clipboardData = data.records;
 
     try {
       await navigator.clipboard.writeText(JSON.stringify(clipboardData, null, 2));
       toast({
         title: "Copied to clipboard",
-        description: `Data point from ${new Date(data.startDateTime).toLocaleString()}`,
+        description: `${data.records.length} record${data.records.length !== 1 ? 's' : ''} from ${new Date(data.startDateTime).toLocaleString()}`,
       });
     } catch (err) {
       toast({
