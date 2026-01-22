@@ -342,7 +342,7 @@ export function Dashboard() {
       })()
     : sortedWatches;
 
-  const statuses = watches.map((w) => w.status);
+  const statuses = watches.filter((w) => w.active).map((w) => w.status);
 
   return (
     <div className="min-h-screen bg-background">
