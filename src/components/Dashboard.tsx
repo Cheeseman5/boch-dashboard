@@ -42,6 +42,7 @@ export function Dashboard() {
   const [watchOrder, setWatchOrder] = useState<string[]>([]);
   const [showInactive, setShowInactive] = useState(false);
   const [historyFilters, setHistoryFilters] = useState<Record<string, HistoryFilter>>({});
+  const [filteredStatuses, setFilteredStatuses] = useState<Record<string, StoplightStatus>>({});
   const [draggedWatch, setDraggedWatch] = useState<string | null>(null);
   const [dragOverWatch, setDragOverWatch] = useState<string | null>(null);
 
@@ -83,6 +84,14 @@ export function Dashboard() {
   // History filter only affects what is displayed, not what is fetched
   const handleHistoryFilterChange = useCallback((watchName: string, filter: HistoryFilter) => {
     setHistoryFilters(prev => ({ ...prev, [watchName]: filter }));
+  }, []);
+
+  // Track filtered status from each WatchCard for 'filtered' statusScope
+  const handleFilteredStatusChange = useCallback((watchName: string, status: StoplightStatus) => {
+    setFilteredStatuses(prev => {
+      if (prev[watchName] === status) return prev;
+      return { ...prev, [watchName]: status };
+    });
   }, []);
 
   const refreshData = useCallback(async () => {
@@ -357,7 +366,15 @@ export function Dashboard() {
     }
   })();
 
-  const statuses = globalWatches.map((w) => w.status);
+  // Determine which status to use based on statusScope config
+  const statuses = globalWatches.map((w) => {
+    if (GLOBAL_SUMMARY_SETTINGS.statusScope === 'filtered') {
+      // Use the filtered status from WatchCard if available, otherwise fall back to base status
+      return filteredStatuses[w.name] ?? w.status;
+    }
+    // 'default' - use base status from full data
+    return w.status;
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -489,6 +506,7 @@ export function Dashboard() {
                 watch={watch}
                 historyFilter={historyFilters[watch.name] ?? 'all'}
                 onHistoryFilterChange={(filter) => handleHistoryFilterChange(watch.name, filter)}
+                onStatusChange={handleFilteredStatusChange}
                 onEdit={() => handleEditWatch(watch)}
                 isDragging={draggedWatch === watch.name}
                 isGhost={draggedWatch !== null && dragOverWatch !== null && watch.name === draggedWatch}
