@@ -442,7 +442,7 @@ export function Dashboard() {
 
       {/* Status Section */}
       {(isConnected || error || !apiKey.trim()) && (
-        <div className="border-b border-border/50 bg-accent/50 dark:bg-muted/30">
+        <div className="border-b border-border/50 bg-primary/10 dark:bg-muted/30">
           <div className="container mx-auto px-4 py-4">
             <div className="flex flex-col items-center gap-4">
               {/* Global Health */}
