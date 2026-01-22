@@ -62,7 +62,7 @@ export type InactiveWatchInclusion = "always" | "never" | "dynamic";
 
 export const GLOBAL_SUMMARY_SETTINGS = {
   /** Which data scope to use for global status calculation */
-  statusScope: "filtered" as GlobalStatusScope,
+  statusScope: "default" as GlobalStatusScope,
 
   /** How to handle inactive watches in global health counts */
   inactiveWatchInclusion: "never" as InactiveWatchInclusion,
