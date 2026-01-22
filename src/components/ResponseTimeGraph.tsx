@@ -28,6 +28,8 @@ export interface BucketData {
   count: number;
   statusSummary: Record<number, number>;
   hasErrors: boolean;
+  /** Original history records in this bucket */
+  records: History[];
 }
 
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: BucketData }> }) {
@@ -131,6 +133,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
       count: bucket.length,
       statusSummary,
       hasErrors,
+      records: bucket,
     });
   }
 
