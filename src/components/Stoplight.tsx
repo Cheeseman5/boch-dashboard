@@ -38,7 +38,7 @@ export function Stoplight({
     if (strobeScope === 'none') return false;
     if (strobeScope === 'all') return true;
     if (strobeScope === 'watches' && context === 'watch') return true;
-    if (strobeScope === 'global' && context === 'global') return true;
+    if (strobeScope === 'summary' && context === 'global') return true;
     return false;
   })();
 
