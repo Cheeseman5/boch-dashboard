@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Pencil, GripHorizontal, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +45,9 @@ export function WatchCard({
   onDrop,
 }: WatchCardProps) {
   const { name, url, intervalMinutes, active, summary, history, isLoading } = watch;
+  
+  // Track which status code is being hovered in the status list
+  const [hoveredStatusCode, setHoveredStatusCode] = useState<number | null>(null);
   
   const filterLabel = HISTORY_FILTER_OPTIONS.find(o => o.value === historyFilter)?.label ?? 'All';
 
@@ -223,7 +226,11 @@ export function WatchCard({
 
           {/* Response Time Graph - fills remaining width */}
           <div className="flex-1 h-[100px]">
-            <ResponseTimeGraph history={filteredHistory || []} isLoading={isLoading} />
+            <ResponseTimeGraph 
+              history={filteredHistory || []} 
+              isLoading={isLoading}
+              highlightStatusCode={hoveredStatusCode}
+            />
           </div>
 
           {/* Status Code Summary - scrollable */}
@@ -240,7 +247,15 @@ export function WatchCard({
                     const isError = numCode >= 400 || numCode === 0;
                     const isWarning = numCode < 200 || numCode >= 300;
                     return (
-                      <div key={code} className="flex justify-between items-center gap-1 text-xs font-mono leading-tight">
+                      <div 
+                        key={code} 
+                        className={cn(
+                          "flex justify-between items-center gap-1 text-xs font-mono leading-tight cursor-pointer rounded px-0.5 transition-colors",
+                          hoveredStatusCode === numCode && "bg-accent"
+                        )}
+                        onMouseEnter={() => setHoveredStatusCode(numCode)}
+                        onMouseLeave={() => setHoveredStatusCode(null)}
+                      >
                         <span className={cn(
                           isError ? 'text-red-500' : isWarning ? 'text-yellow-500' : 'text-green-500'
                         )}>
