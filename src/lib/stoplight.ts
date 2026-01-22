@@ -1,4 +1,5 @@
 import type { History, HistorySummaryResponse, StoplightStatus } from '@/types/api';
+import { STOPLIGHT_THRESHOLDS } from '@/config/app.config';
 
 function calculateP95(responseTimes: number[]): number {
   if (responseTimes.length === 0) return 0;
@@ -38,6 +39,8 @@ export function calculateWatchStatusWithDetails(
   summary?: HistorySummaryResponse,
   history?: History[]
 ): WatchStatusResult {
+  const { criticalLatencyMs, warningLatencyMs } = STOPLIGHT_THRESHOLDS;
+
   // No history records → grey
   if (!summary || summary.histroyRecordCount === 0) {
     return { status: 'grey', p95: null, reason: 'No data' };
@@ -57,13 +60,13 @@ export function calculateWatchStatusWithDetails(
     return { status: 'red', p95, reason: `Error responses: ${errorCodes}` };
   }
 
-  // Check for extreme latency
-  if (p95 >= 2000) {
+  // Check for extreme latency (RED)
+  if (p95 >= criticalLatencyMs) {
     return { status: 'red', p95, reason: `P95: ${Math.round(p95).toLocaleString()} ms` };
   }
 
-  // Check for high latency
-  if (p95 >= 500) {
+  // Check for high latency (YELLOW)
+  if (p95 >= warningLatencyMs) {
     return { status: 'yellow', p95, reason: `P95: ${Math.round(p95).toLocaleString()} ms` };
   }
 
@@ -72,7 +75,7 @@ export function calculateWatchStatusWithDetails(
     return { status: 'yellow', p95, reason: 'Mixed status codes' };
   }
 
-  // All good: P95 < 500ms and all 2xx
+  // All good: P95 < warningLatencyMs and all 2xx
   return { status: 'green', p95, reason: `P95: ${Math.round(p95).toLocaleString()} ms` };
 }
 
