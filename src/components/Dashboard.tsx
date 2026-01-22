@@ -32,6 +32,8 @@ import type {
 import { toast } from '@/hooks/use-toast';
 
 const LOCAL_STORAGE_KEY = 'boch-api-key';
+const WATCH_ORDER_STORAGE_KEY = 'boch-watch-order';
+const HISTORY_FILTERS_STORAGE_KEY = 'boch-history-filters';
 
 export function Dashboard() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem(LOCAL_STORAGE_KEY) || '');
@@ -39,9 +41,23 @@ export function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [watches, setWatches] = useState<WatchWithData[]>([]);
-  const [watchOrder, setWatchOrder] = useState<string[]>([]);
+  const [watchOrder, setWatchOrder] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem(WATCH_ORDER_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const [showInactive, setShowInactive] = useState(false);
-  const [historyFilters, setHistoryFilters] = useState<Record<string, HistoryFilter>>({});
+  const [historyFilters, setHistoryFilters] = useState<Record<string, HistoryFilter>>(() => {
+    try {
+      const stored = localStorage.getItem(HISTORY_FILTERS_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
   const [filteredStatuses, setFilteredStatuses] = useState<Record<string, StoplightStatus>>({});
   const [draggedWatch, setDraggedWatch] = useState<string | null>(null);
   const [dragOverWatch, setDragOverWatch] = useState<string | null>(null);
@@ -83,7 +99,11 @@ export function Dashboard() {
 
   // History filter only affects what is displayed, not what is fetched
   const handleHistoryFilterChange = useCallback((watchName: string, filter: HistoryFilter) => {
-    setHistoryFilters(prev => ({ ...prev, [watchName]: filter }));
+    setHistoryFilters(prev => {
+      const updated = { ...prev, [watchName]: filter };
+      localStorage.setItem(HISTORY_FILTERS_STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   }, []);
 
   // Track filtered status from each WatchCard for 'filtered' statusScope
@@ -164,8 +184,11 @@ export function Dashboard() {
       setIsConnected(false);
       setWatches([]);
       setWatchOrder([]);
+      setHistoryFilters({});
       setError(null);
       localStorage.removeItem(LOCAL_STORAGE_KEY);
+      localStorage.removeItem(WATCH_ORDER_STORAGE_KEY);
+      localStorage.removeItem(HISTORY_FILTERS_STORAGE_KEY);
     }
   };
 
@@ -314,6 +337,7 @@ export function Dashboard() {
       baseOrder.splice(draggedIndex, 1);
       baseOrder.splice(targetIndex, 0, draggedName);
       setWatchOrder(baseOrder);
+      localStorage.setItem(WATCH_ORDER_STORAGE_KEY, JSON.stringify(baseOrder));
     }
 
     setDraggedWatch(null);
