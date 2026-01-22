@@ -15,6 +15,8 @@ import { STOPLIGHT_THRESHOLDS } from '@/config/app.config';
 interface ResponseTimeGraphProps {
   history: History[];
   isLoading?: boolean;
+  /** Status code to highlight on the graph (from status list hover) */
+  highlightStatusCode?: number | null;
 }
 
 interface BucketData {
@@ -67,7 +69,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   );
 }
 
-export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps) {
+export function ResponseTimeGraph({ history, isLoading, highlightStatusCode }: ResponseTimeGraphProps) {
   // Generate unique ID for this chart instance to avoid gradient conflicts
   const chartId = React.useId().replace(/:/g, '');
 
@@ -286,14 +288,26 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
                 fill={`url(#fillGradient-${chartId})`}
                 dot={(props: { cx?: number; cy?: number; payload?: BucketData }) => {
                   const { cx, cy, payload } = props;
-                  if (!payload?.hasErrors || cx === undefined || cy === undefined) return <g />;
+                  if (cx === undefined || cy === undefined) return <g />;
+                  
+                  // Check if this bucket should be highlighted (contains the hovered status code)
+                  const isHighlighted = highlightStatusCode !== null && 
+                    highlightStatusCode !== undefined && 
+                    payload?.statusSummary[highlightStatusCode] !== undefined;
+                  
+                  // Show dot if bucket has errors OR if it's highlighted
+                  if (!payload?.hasErrors && !isHighlighted) return <g />;
+                  
                   return (
                     <circle
                       cx={cx}
                       cy={cy}
-                      r={3}
+                      r={isHighlighted ? 5 : 3}
                       fill="hsl(var(--stoplight-red))"
-                      fillOpacity={0.5}
+                      fillOpacity={isHighlighted ? 0.9 : 0.5}
+                      stroke={isHighlighted ? "hsl(var(--background))" : "none"}
+                      strokeWidth={isHighlighted ? 2 : 0}
+                      className={isHighlighted ? "animate-pulse" : ""}
                     />
                   );
                 }}
