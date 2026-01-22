@@ -11,7 +11,7 @@ import {
 import type { History } from '@/types/api';
 import { format } from 'date-fns';
 import { STOPLIGHT_THRESHOLDS } from '@/config/app.config';
-import { getPercentileLabel } from '@/lib/stoplight';
+import { getAggregationLabel, aggregateResponseTimes } from '@/lib/stoplight';
 
 interface ResponseTimeGraphProps {
   history: History[];
@@ -48,7 +48,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
         → {format(new Date(data.endDateTime), 'MMM d, HH:mm:ss')}
       </p>
       <p className="text-sm font-medium">
-        {getPercentileLabel()}: {data.responseTimeMs.toLocaleString()}ms
+        {getAggregationLabel()}: {data.responseTimeMs.toLocaleString()}ms
       </p>
       {statusEntries.length > 0 && (
         <div className="flex flex-col gap-0.5 my-1">
@@ -101,13 +101,6 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     console.debug('[ResponseTimeGraph] Rendering with', history.length, 'records')
   }
 
-  // Calculate P95 for an array of values
-  const calculateP95 = (values: number[]): number => {
-    if (values.length === 0) return 0;
-    const sorted = [...values].sort((a, b) => a - b);
-    const index = Math.ceil(sorted.length * 0.95) - 1;
-    return sorted[Math.max(0, index)];
-  };
 
   // Group into max 90 buckets
   const maxBuckets = 90;
@@ -130,7 +123,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     chartData.push({
       startDateTime: bucket[0].dateTime,
       endDateTime: bucket[bucket.length - 1].dateTime,
-      responseTimeMs: calculateP95(responseTimes),
+      responseTimeMs: aggregateResponseTimes(responseTimes),
       count: bucket.length,
       statusSummary,
       hasErrors,
