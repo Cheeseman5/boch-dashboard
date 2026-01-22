@@ -31,11 +31,11 @@ export interface HistoryRaw {
   peekResponseContent: string;
 }
 
-// Stripped version without peekResponseContent to reduce memory
 export interface History {
   dateTime: string;
   statusCode: number;
   responseTimeMs: number;
+  peekResponseContent: string;
 }
 
 export interface HistoryResponse {
