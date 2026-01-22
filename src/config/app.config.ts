@@ -51,6 +51,13 @@ export type PercentileValue = number;
  */
 export type GraphAggregationMethod = "max" | "min" | "avg" | "percentile";
 
+/**
+ * Summary metrics data scope: determines which data is used for watch summary metrics (Min, Avg, Max).
+ * - 'total': Always use the total dataset (all history records)
+ * - 'filtered': Use only the currently filtered/viewed dataset
+ */
+export type SummaryMetricsScope = "total" | "filtered";
+
 export const STOPLIGHT_THRESHOLDS = {
   /** Which percentile to use for latency calculations (e.g., 95 = P95). Any value 1-100. */
   percentile: 90 as PercentileValue,
@@ -63,6 +70,9 @@ export const STOPLIGHT_THRESHOLDS = {
 
   /** How to aggregate response times for each graph bucket */
   graphAggregation: "percentile" as GraphAggregationMethod,
+
+  /** Which dataset to use for watch summary metrics (Min, Avg, Max) */
+  summaryMetricsScope: "filtered" as SummaryMetricsScope,
 } as const;
 
 // ============================================================================

@@ -14,7 +14,7 @@ import { ResponseTimeGraph, type BucketData } from './ResponseTimeGraph';
 import type { WatchWithData, HistoryFilter, HistorySummaryResponse } from '@/types/api';
 import { cn } from '@/lib/utils';
 import { calculateWatchStatusWithDetails } from '@/lib/stoplight';
-import { HISTORY_FILTER_OPTIONS } from '@/config/app.config';
+import { HISTORY_FILTER_OPTIONS, STOPLIGHT_THRESHOLDS } from '@/config/app.config';
 import { useToast } from '@/hooks/use-toast';
 interface WatchCardProps {
   watch: WatchWithData;
@@ -103,8 +103,34 @@ export function WatchCard({
     }
   }, [name, status, onStatusChange]);
 
-  // Calculate metrics from filtered data, or use summary when 'all'
+  // Calculate metrics based on summaryMetricsScope setting
   const metrics = (() => {
+    const useTotal = STOPLIGHT_THRESHOLDS.summaryMetricsScope === 'total';
+    
+    // Use total dataset (from API summary or full history)
+    if (useTotal) {
+      if (summary) {
+        return {
+          count: summary.histroyRecordCount,
+          min: summary.responseTime?.min,
+          avg: summary.responseTime?.avg,
+          max: summary.responseTime?.max,
+        };
+      }
+      // Fallback to full history if summary not available
+      if (!history || history.length === 0) {
+        return { count: 0, min: undefined, avg: undefined, max: undefined };
+      }
+      const times = history.map(h => h.responseTimeMs);
+      return {
+        count: history.length,
+        min: Math.min(...times),
+        avg: times.reduce((a, b) => a + b, 0) / times.length,
+        max: Math.max(...times),
+      };
+    }
+    
+    // Use filtered dataset
     if (historyFilter === 'all' && summary) {
       return {
         count: summary.histroyRecordCount,
