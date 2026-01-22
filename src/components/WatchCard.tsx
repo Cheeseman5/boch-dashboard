@@ -94,7 +94,14 @@ export function WatchCard({
       }
     : summary;
 
-  const { status, reason: statusReason } = calculateWatchStatusWithDetails(filteredSummary, filteredHistory);
+  // Calculate stoplight status based on watchStatusScope setting
+  const { status, reason: statusReason } = (() => {
+    const useTotal = STOPLIGHT_THRESHOLDS.watchStatusScope === 'total';
+    if (useTotal) {
+      return calculateWatchStatusWithDetails(summary, history);
+    }
+    return calculateWatchStatusWithDetails(filteredSummary, filteredHistory);
+  })();
 
   // Notify parent of filtered status changes for global health calculation
   useEffect(() => {
