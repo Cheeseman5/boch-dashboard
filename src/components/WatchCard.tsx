@@ -10,11 +10,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Stoplight } from './Stoplight';
-import { ResponseTimeGraph } from './ResponseTimeGraph';
+import { ResponseTimeGraph, type BucketData } from './ResponseTimeGraph';
 import type { WatchWithData, HistoryFilter, HistorySummaryResponse } from '@/types/api';
 import { cn } from '@/lib/utils';
 import { calculateWatchStatusWithDetails } from '@/lib/stoplight';
 import { HISTORY_FILTER_OPTIONS } from '@/config/app.config';
+import { useToast } from '@/hooks/use-toast';
 interface WatchCardProps {
   watch: WatchWithData;
   historyFilter: HistoryFilter;
@@ -45,10 +46,38 @@ export function WatchCard({
   onDrop,
 }: WatchCardProps) {
   const { name, url, intervalMinutes, active, summary, history, isLoading } = watch;
+  const { toast } = useToast();
   
   // Track which status code is being hovered in the status list
   const [hoveredStatusCode, setHoveredStatusCode] = useState<number | null>(null);
-  
+
+  // Handle click on graph data point - copy to clipboard
+  const handleDataPointClick = async (data: BucketData) => {
+    const clipboardData = {
+      watchName: name,
+      timeRange: {
+        start: data.startDateTime,
+        end: data.endDateTime,
+      },
+      p95ResponseTimeMs: data.responseTimeMs,
+      requestCount: data.count,
+      statusCodes: data.statusSummary,
+    };
+
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(clipboardData, null, 2));
+      toast({
+        title: "Copied to clipboard",
+        description: `Data point from ${new Date(data.startDateTime).toLocaleString()}`,
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to copy",
+        description: "Could not copy data to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
   const filterLabel = HISTORY_FILTER_OPTIONS.find(o => o.value === historyFilter)?.label ?? 'All';
 
   // Filter history client-side based on the selected filter
@@ -230,6 +259,7 @@ export function WatchCard({
               history={filteredHistory || []} 
               isLoading={isLoading}
               highlightStatusCode={hoveredStatusCode}
+              onDataPointClick={handleDataPointClick}
             />
           </div>
 

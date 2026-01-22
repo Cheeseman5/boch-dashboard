@@ -17,9 +17,11 @@ interface ResponseTimeGraphProps {
   isLoading?: boolean;
   /** Status code to highlight on the graph (from status list hover) */
   highlightStatusCode?: number | null;
+  /** Callback when a data point is clicked */
+  onDataPointClick?: (data: BucketData) => void;
 }
 
-interface BucketData {
+export interface BucketData {
   startDateTime: string;
   endDateTime: string;
   responseTimeMs: number;
@@ -69,7 +71,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   );
 }
 
-export function ResponseTimeGraph({ history, isLoading, highlightStatusCode }: ResponseTimeGraphProps) {
+export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onDataPointClick }: ResponseTimeGraphProps) {
   // Generate unique ID for this chart instance to avoid gradient conflicts
   const chartId = React.useId().replace(/:/g, '');
 
@@ -223,7 +225,16 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode }: R
         {/* Chart area */}
         <div className="flex-1 min-h-0">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+            <AreaChart 
+              data={chartData} 
+              margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+              onClick={(e) => {
+                if (e?.activePayload?.[0]?.payload && onDataPointClick) {
+                  onDataPointClick(e.activePayload[0].payload as BucketData);
+                }
+              }}
+              style={{ cursor: onDataPointClick ? 'pointer' : 'default' }}
+            >
               <defs>
                 <linearGradient id={`strokeGradient-${chartId}`} x1="0" y1="0" x2="0" y2="1">
                   {gradientStops.map((stop, i) => (
