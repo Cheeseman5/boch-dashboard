@@ -77,8 +77,18 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
 export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onDataPointClick }: ResponseTimeGraphProps) {
   // Generate unique ID for this chart instance to avoid gradient conflicts
   const chartId = React.useId().replace(/:/g, '');
+  
+  // Defer rendering to avoid "Layout was forced before the page was fully loaded" warning
+  const [isReady, setIsReady] = React.useState(false);
+  React.useEffect(() => {
+    // Use requestAnimationFrame to defer until after first paint
+    const rafId = requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+    return () => cancelAnimationFrame(rafId);
+  }, []);
 
-  if (isLoading) {
+  if (isLoading || !isReady) {
     return (
       <div className="h-full w-full min-h-[160px] skeleton-pulse" />
     );
