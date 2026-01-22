@@ -307,7 +307,6 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode }: R
                       fillOpacity={isHighlighted ? 0.9 : 0.5}
                       stroke={isHighlighted ? "hsl(var(--background))" : "none"}
                       strokeWidth={isHighlighted ? 2 : 0}
-                      className={isHighlighted ? "animate-pulse" : ""}
                     />
                   );
                 }}
