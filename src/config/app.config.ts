@@ -87,5 +87,5 @@ export const STOPLIGHT_ANIMATION_SETTINGS = {
   strobeScope: "all" as StoplightStrobeScope,
 
   /** Animation speed in seconds (lower = faster) */
-  strobeSpeedSeconds: 2,
+  strobeSpeedSeconds: 1,
 } as const;
