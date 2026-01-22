@@ -57,6 +57,19 @@ export function ThemeToggle() {
       console.debug('[ThemeToggle] after DOM class sync', {
         htmlClassAfter: document.documentElement.className,
       });
+
+      // Check if CSS variables actually changed
+      setTimeout(() => {
+        const computedBg = getComputedStyle(document.documentElement).getPropertyValue('--background');
+        const bodyBgColor = getComputedStyle(document.body).backgroundColor;
+        // eslint-disable-next-line no-console
+        console.debug('[ThemeToggle] CSS check', {
+          '--background': computedBg,
+          'body backgroundColor': bodyBgColor,
+          'expected for light': '210 40% 98%',
+          'expected for dark': '222 47% 6%',
+        });
+      }, 100);
     }
   }, [isDark, setTheme, theme, resolvedTheme, currentTheme]);
 
