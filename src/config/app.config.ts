@@ -5,8 +5,6 @@
  * New developers can modify these values without diving into component code.
  */
 
-import type { HistoryFilter } from "@/types/api";
-
 // ============================================================================
 // HISTORY FILTER OPTIONS
 // ============================================================================
@@ -14,7 +12,7 @@ import type { HistoryFilter } from "@/types/api";
 // - value: The filter value (number = last N records, 'all' = show all)
 // - label: Display text shown in the dropdown
 
-export const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] = [
+export const HISTORY_FILTER_OPTIONS = [
   { value: 30, label: "30" },
   { value: 90, label: "90" },
   { value: 180, label: "180" },
@@ -22,7 +20,10 @@ export const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] =
   { value: 1000, label: "1000" },
   { value: 5000, label: "5000" },
   { value: "all", label: "All" },
-];
+] as const;
+
+// Type derived from the options array above (single source of truth)
+export type HistoryFilter = (typeof HISTORY_FILTER_OPTIONS)[number]["value"];
 
 // Default filter applied to new watches
 export const DEFAULT_HISTORY_FILTER: HistoryFilter = 30;
