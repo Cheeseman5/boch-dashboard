@@ -13,13 +13,7 @@ import { ResponseTimeGraph } from './ResponseTimeGraph';
 import type { WatchWithData, HistoryFilter, HistorySummaryResponse } from '@/types/api';
 import { cn } from '@/lib/utils';
 import { calculateWatchStatusWithDetails } from '@/lib/stoplight';
-
-const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] = [
-  { value: 30, label: '30' },
-  { value: 90, label: '90' },
-  { value: 180, label: '180' },
-  { value: 'all', label: 'All' },
-];
+import { HISTORY_FILTER_OPTIONS } from '@/config/app.config';
 interface WatchCardProps {
   watch: WatchWithData;
   historyFilter: HistoryFilter;
