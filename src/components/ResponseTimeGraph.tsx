@@ -298,12 +298,26 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode }: R
                   // Show dot if bucket has errors OR if it's highlighted
                   if (!payload?.hasErrors && !isHighlighted) return <g />;
                   
+                  // Determine dot color based on the highlighted status code
+                  const getDotColor = () => {
+                    if (isHighlighted && highlightStatusCode !== null) {
+                      const code = highlightStatusCode;
+                      const isError = code >= 400 || code === 0;
+                      const isSuccess = code >= 200 && code < 300;
+                      if (isError) return 'hsl(var(--stoplight-red))';
+                      if (isSuccess) return 'hsl(var(--stoplight-green))';
+                      return 'hsl(var(--stoplight-yellow))';
+                    }
+                    // Default to red for error dots when not highlighting
+                    return 'hsl(var(--stoplight-red))';
+                  };
+                  
                   return (
                     <circle
                       cx={cx}
                       cy={cy}
                       r={isHighlighted ? 5 : 3}
-                      fill="hsl(var(--stoplight-red))"
+                      fill={getDotColor()}
                       fillOpacity={isHighlighted ? 0.9 : 0.5}
                       stroke={isHighlighted ? "hsl(var(--background))" : "none"}
                       strokeWidth={isHighlighted ? 2 : 0}
