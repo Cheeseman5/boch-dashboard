@@ -63,7 +63,7 @@ export type SummaryMetricsScope = "total" | "filtered";
 
 export const STOPLIGHT_THRESHOLDS = {
   /** Which percentile to use for latency calculations (e.g., 95 = P95). Any value 1-100. */
-  percentile: 90 as PercentileValue,
+  percentile: 95 as PercentileValue,
 
   /** Percentile response time (ms) that triggers RED status */
   criticalLatencyMs: 3000,
@@ -75,7 +75,7 @@ export const STOPLIGHT_THRESHOLDS = {
   graphAggregation: "percentile" as GraphAggregationMethod,
 
   /** Which dataset to use for watch summary metrics (Min, Avg, Max) */
-  summaryMetricsScope: "filtered" as SummaryMetricsScope,
+  summaryMetricsScope: "total" as SummaryMetricsScope,
 } as const;
 
 // ============================================================================
