@@ -26,7 +26,8 @@ export function GlobalHealth({ statuses, isLoading }: GlobalHealthProps) {
         <Stoplight 
           status={globalStatus} 
           size="lg" 
-          animate={false}
+          animate={!isLoading && globalStatus !== 'grey'}
+          context="global"
         />
         <div>
           <h2 className="text-2xl font-semibold">

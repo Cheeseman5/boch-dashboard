@@ -67,3 +67,25 @@ export const GLOBAL_SUMMARY_SETTINGS = {
   /** How to handle inactive watches in global health counts */
   inactiveWatchInclusion: "never" as InactiveWatchInclusion,
 } as const;
+
+// ============================================================================
+// STOPLIGHT ANIMATION SETTINGS
+// ============================================================================
+// Controls the pulsing/strobing animation on stoplights.
+
+/**
+ * Stoplight strobe scope: determines which stoplights animate
+ * - 'all': Both watch stoplights and global stoplight strobe
+ * - 'watches': Only individual watch stoplights strobe
+ * - 'global': Only the global health stoplight strobes
+ * - 'none': No strobing animations
+ */
+export type StoplightStrobeScope = "all" | "watches" | "global" | "none";
+
+export const STOPLIGHT_ANIMATION_SETTINGS = {
+  /** Which stoplights should strobe/pulse */
+  strobeScope: "all" as StoplightStrobeScope,
+
+  /** Animation speed in seconds (lower = faster) */
+  strobeSpeedSeconds: 2,
+} as const;
