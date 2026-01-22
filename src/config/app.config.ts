@@ -62,7 +62,7 @@ export type InactiveWatchInclusion = "always" | "never" | "dynamic";
 
 export const GLOBAL_SUMMARY_SETTINGS = {
   /** Which data scope to use for global status calculation */
-  statusScope: "default" as GlobalStatusScope,
+  statusScope: "filtered" as GlobalStatusScope,
 
   /** How to handle inactive watches in global health counts */
   inactiveWatchInclusion: "never" as InactiveWatchInclusion,
@@ -91,9 +91,9 @@ export const STOPLIGHT_ANIMATION_SETTINGS = {
 
   /** Which status states should strobe (true = strobe enabled) */
   strobeStates: {
-    red: true,
-    yellow: true,
-    green: false,
+    red: false,
+    yellow: false,
+    green: true,
     grey: false,
   },
 } as const;
