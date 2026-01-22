@@ -1,11 +1,21 @@
 import type { History, HistorySummaryResponse, StoplightStatus } from '@/types/api';
-import { STOPLIGHT_THRESHOLDS } from '@/config/app.config';
+import { STOPLIGHT_THRESHOLDS, type PercentileValue } from '@/config/app.config';
 
-function calculateP95(responseTimes: number[]): number {
+/**
+ * Calculate the Nth percentile of response times.
+ * @param responseTimes - Array of response times in ms
+ * @param percentile - The percentile to calculate (e.g., 95 for P95)
+ */
+function calculatePercentile(responseTimes: number[], percentile: PercentileValue = 95): number {
   if (responseTimes.length === 0) return 0;
   const sorted = [...responseTimes].sort((a, b) => a - b);
-  const index = Math.floor(sorted.length * 0.95);
+  const index = Math.floor(sorted.length * (percentile / 100));
   return sorted[Math.min(index, sorted.length - 1)];
+}
+
+/** Get the display label for the configured percentile (e.g., "P95", "P99") */
+export function getPercentileLabel(): string {
+  return `P${STOPLIGHT_THRESHOLDS.percentile}`;
 }
 
 function hasFailedResponses(statusSummary: Record<number, number>): boolean {
@@ -47,7 +57,11 @@ export function calculateWatchStatusWithDetails(
   }
 
   const responseTimes = history?.map((h) => h.responseTimeMs) || [];
-  const p95 = responseTimes.length > 0 ? calculateP95(responseTimes) : summary.responseTime.avg;
+  const percentileValue = responseTimes.length > 0 
+    ? calculatePercentile(responseTimes, STOPLIGHT_THRESHOLDS.percentile) 
+    : summary.responseTime.avg;
+
+  const label = getPercentileLabel();
 
   // Check for failed responses (4xx, 5xx, or 0)
   if (hasFailedResponses(summary.statusSummary)) {
@@ -57,26 +71,26 @@ export function calculateWatchStatusWithDetails(
         return numCode >= 400 || numCode === 0;
       })
       .join(', ');
-    return { status: 'red', p95, reason: `Error responses: ${errorCodes}` };
+    return { status: 'red', p95: percentileValue, reason: `Error responses: ${errorCodes}` };
   }
 
   // Check for extreme latency (RED)
-  if (p95 >= criticalLatencyMs) {
-    return { status: 'red', p95, reason: `P95: ${Math.round(p95).toLocaleString()} ms` };
+  if (percentileValue >= criticalLatencyMs) {
+    return { status: 'red', p95: percentileValue, reason: `${label}: ${Math.round(percentileValue).toLocaleString()} ms` };
   }
 
   // Check for high latency (YELLOW)
-  if (p95 >= warningLatencyMs) {
-    return { status: 'yellow', p95, reason: `P95: ${Math.round(p95).toLocaleString()} ms` };
+  if (percentileValue >= warningLatencyMs) {
+    return { status: 'yellow', p95: percentileValue, reason: `${label}: ${Math.round(percentileValue).toLocaleString()} ms` };
   }
 
   // Check for mixed status codes
   if (hasMixedStatusCodes(summary.statusSummary)) {
-    return { status: 'yellow', p95, reason: 'Mixed status codes' };
+    return { status: 'yellow', p95: percentileValue, reason: 'Mixed status codes' };
   }
 
-  // All good: P95 < warningLatencyMs and all 2xx
-  return { status: 'green', p95, reason: `P95: ${Math.round(p95).toLocaleString()} ms` };
+  // All good: percentile < warningLatencyMs and all 2xx
+  return { status: 'green', p95: percentileValue, reason: `${label}: ${Math.round(percentileValue).toLocaleString()} ms` };
 }
 
 export function calculateGlobalStatus(statuses: StoplightStatus[]): StoplightStatus {

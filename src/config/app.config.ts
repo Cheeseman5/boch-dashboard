@@ -28,16 +28,27 @@ export const DEFAULT_HISTORY_FILTER: HistoryFilter = 30;
 // ============================================================================
 // STOPLIGHT THRESHOLDS
 // ============================================================================
-// Controls when watch status changes color based on P95 response time (in ms).
-// - RED: P95 >= criticalLatencyMs (severe performance issue)
-// - YELLOW: P95 >= warningLatencyMs (degraded performance)
-// - GREEN: P95 < warningLatencyMs (healthy)
+// Controls when watch status changes color based on percentile response time.
+
+/**
+ * Percentile algorithm for latency calculations.
+ * Common values:
+ * - 95: P95 (95th percentile) - balanced view, filters top 5% outliers
+ * - 98: P98 (98th percentile) - stricter, only filters top 2% outliers
+ * - 99: P99 (99th percentile) - strictest, catches near-worst-case latency
+ * - 90: P90 (90th percentile) - more lenient, filters top 10% outliers
+ * - 50: P50 (median) - typical user experience
+ */
+export type PercentileValue = 50 | 90 | 95 | 98 | 99;
 
 export const STOPLIGHT_THRESHOLDS = {
-  /** P95 response time (ms) that triggers RED status */
+  /** Which percentile to use for latency calculations (e.g., 95 = P95) */
+  percentile: 95 as PercentileValue,
+
+  /** Percentile response time (ms) that triggers RED status */
   criticalLatencyMs: 3000,
 
-  /** P95 response time (ms) that triggers YELLOW status */
+  /** Percentile response time (ms) that triggers YELLOW status */
   warningLatencyMs: 1000,
 } as const;
 
