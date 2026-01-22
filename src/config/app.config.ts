@@ -62,7 +62,7 @@ export const STOPLIGHT_THRESHOLDS = {
   warningLatencyMs: 1000,
 
   /** How to aggregate response times for each graph bucket */
-  graphAggregation: "avg" as GraphAggregationMethod,
+  graphAggregation: "percentile" as GraphAggregationMethod,
 } as const;
 
 // ============================================================================
