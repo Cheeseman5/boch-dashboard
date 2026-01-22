@@ -248,7 +248,8 @@ export function ResponseTimeGraph({ history, isLoading }: ResponseTimeGraphProps
               <Tooltip 
                 content={<CustomTooltip />} 
                 wrapperStyle={{ zIndex: 9999, pointerEvents: 'none' }}
-                allowEscapeViewBox={{ x: true, y: true }}
+                allowEscapeViewBox={{ x: false, y: true }}
+                position={{ x: undefined, y: undefined }}
               />
               {/* Baseline at lowest value */}
               <ReferenceLine
