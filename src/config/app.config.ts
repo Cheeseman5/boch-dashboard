@@ -55,12 +55,15 @@ export type PercentileValue = number;
 export type GraphAggregationMethod = "max" | "min" | "avg" | "percentile";
 
 /**
- * Summary metrics data scope: determines which data is used for watch summary metrics (Min, Avg, Max).
- * - 'total': Always use the total dataset (all history records)
- * - 'filtered': Use only the currently filtered/viewed dataset
+ * Data scope for watch-level calculations.
+ * Used by both stoplight status and summary metrics to determine their data source.
+ * - 'total': Always use the complete dataset (all history records for the watch)
+ * - 'filtered': Use only the currently filtered/viewed dataset (respects history dropdown)
  */
-export type SummaryMetricsScope = "total" | "filtered";
+export type WatchDataScope = "total" | "filtered";
 
+/** @deprecated Use WatchDataScope instead */
+export type SummaryMetricsScope = WatchDataScope;
 export const STOPLIGHT_THRESHOLDS = {
   /** Which percentile to use for latency calculations (e.g., 95 = P95). Any value 1-100. */
   percentile: 95 as PercentileValue,
@@ -74,8 +77,19 @@ export const STOPLIGHT_THRESHOLDS = {
   /** How to aggregate response times for each graph bucket */
   graphAggregation: "percentile" as GraphAggregationMethod,
 
-  /** Which dataset to use for watch summary metrics (Min, Avg, Max) */
-  summaryMetricsScope: "total" as SummaryMetricsScope,
+  /**
+   * Data scope for watch-level STOPLIGHT STATUS (the colored indicator).
+   * - 'total': Status reflects the entire watch history (default behavior)
+   * - 'filtered': Status reflects only the currently viewed/filtered records
+   */
+  watchStatusScope: "total" as WatchDataScope,
+
+  /**
+   * Data scope for watch-level SUMMARY METRICS (Min, Avg, Max values).
+   * - 'total': Metrics reflect the entire watch history
+   * - 'filtered': Metrics reflect only the currently viewed/filtered records
+   */
+  summaryMetricsScope: "total" as WatchDataScope,
 } as const;
 
 // ============================================================================
