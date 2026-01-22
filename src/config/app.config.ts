@@ -23,3 +23,19 @@ export const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] =
 
 // Default filter applied to new watches
 export const DEFAULT_HISTORY_FILTER: HistoryFilter = 30;
+
+// ============================================================================
+// STOPLIGHT THRESHOLDS
+// ============================================================================
+// Controls when watch status changes color based on P95 response time (in ms).
+// - RED: P95 >= criticalLatencyMs (severe performance issue)
+// - YELLOW: P95 >= warningLatencyMs (degraded performance)
+// - GREEN: P95 < warningLatencyMs (healthy)
+
+export const STOPLIGHT_THRESHOLDS = {
+  /** P95 response time (ms) that triggers RED status */
+  criticalLatencyMs: 2000,
+  
+  /** P95 response time (ms) that triggers YELLOW status */
+  warningLatencyMs: 500,
+} as const;
