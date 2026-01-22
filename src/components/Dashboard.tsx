@@ -20,6 +20,7 @@ import {
   deleteWatch,
 } from '@/lib/api';
 import { calculateWatchStatus } from '@/lib/stoplight';
+import { GLOBAL_SUMMARY_SETTINGS } from '@/config/app.config';
 import type {
   Watch,
   WatchWithData,
@@ -342,7 +343,21 @@ export function Dashboard() {
       })()
     : sortedWatches;
 
-  const statuses = watches.filter((w) => w.active).map((w) => w.status);
+  // Calculate which watches to include in global health based on config
+  const globalWatches = (() => {
+    const { inactiveWatchInclusion } = GLOBAL_SUMMARY_SETTINGS;
+    
+    if (inactiveWatchInclusion === 'always') {
+      return watches;
+    } else if (inactiveWatchInclusion === 'never') {
+      return watches.filter((w) => w.active);
+    } else {
+      // 'dynamic' - match the showInactive toggle
+      return showInactive ? watches : watches.filter((w) => w.active);
+    }
+  })();
+
+  const statuses = globalWatches.map((w) => w.status);
 
   return (
     <div className="min-h-screen bg-background">
