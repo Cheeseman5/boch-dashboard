@@ -11,6 +11,7 @@ import {
 import type { History } from '@/types/api';
 import { format } from 'date-fns';
 import { STOPLIGHT_THRESHOLDS } from '@/config/app.config';
+import { getPercentileLabel } from '@/lib/stoplight';
 
 interface ResponseTimeGraphProps {
   history: History[];
@@ -47,7 +48,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
         → {format(new Date(data.endDateTime), 'MMM d, HH:mm:ss')}
       </p>
       <p className="text-sm font-medium">
-        P95: {data.responseTimeMs.toLocaleString()}ms
+        {getPercentileLabel()}: {data.responseTimeMs.toLocaleString()}ms
       </p>
       {statusEntries.length > 0 && (
         <div className="flex flex-col gap-0.5 my-1">
