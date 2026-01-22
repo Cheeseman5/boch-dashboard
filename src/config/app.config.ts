@@ -50,7 +50,7 @@ export const STOPLIGHT_THRESHOLDS = {
  * - 'default': Uses all data from watches (not affected by per-card filters)
  * - 'filtered': Global status changes to match the currently viewed/filtered state
  */
-export type GlobalStatusScope = 'default' | 'filtered';
+export type GlobalStatusScope = "default" | "filtered";
 
 /**
  * Inactive watch inclusion: determines if inactive watches count in global summary
@@ -58,12 +58,12 @@ export type GlobalStatusScope = 'default' | 'filtered';
  * - 'never': Never include inactive watches in global health
  * - 'dynamic': Only include inactive watches if showInactive toggle is enabled
  */
-export type InactiveWatchInclusion = 'always' | 'never' | 'dynamic';
+export type InactiveWatchInclusion = "always" | "never" | "dynamic";
 
 export const GLOBAL_SUMMARY_SETTINGS = {
   /** Which data scope to use for global status calculation */
-  statusScope: 'default' as GlobalStatusScope,
+  statusScope: "filtered" as GlobalStatusScope,
 
   /** How to handle inactive watches in global health counts */
-  inactiveWatchInclusion: 'never' as InactiveWatchInclusion,
+  inactiveWatchInclusion: "never" as InactiveWatchInclusion,
 } as const;
