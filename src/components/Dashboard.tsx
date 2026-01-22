@@ -76,15 +76,12 @@ export function Dashboard() {
         getHistory(apiKey, watch.name), // Always fetch all records
       ]);
 
-      // Strip peekResponseContent to reduce memory usage
-      const strippedRecords = historyResponse.records.map(({ peekResponseContent, ...rest }) => rest);
-
-      const status = calculateWatchStatus(summary, strippedRecords);
+      const status = calculateWatchStatus(summary, historyResponse.records);
 
       return {
         ...watch,
         summary,
-        history: strippedRecords,
+        history: historyResponse.records,
         status,
         isLoading: false,
       };
