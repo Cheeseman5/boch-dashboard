@@ -80,7 +80,7 @@ export const GLOBAL_SUMMARY_SETTINGS = {
  * - 'global': Only the global health stoplight strobes
  * - 'none': No strobing animations
  */
-export type StoplightStrobeScope = "all" | "watches" | "global" | "none";
+export type StoplightStrobeScope = "all" | "watches" | "summary" | "none";
 
 export const STOPLIGHT_ANIMATION_SETTINGS = {
   /** Which stoplights should strobe/pulse */
