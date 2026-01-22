@@ -89,7 +89,7 @@ export const STOPLIGHT_THRESHOLDS = {
    * - 'total': Metrics reflect the entire watch history
    * - 'filtered': Metrics reflect only the currently viewed/filtered records
    */
-  summaryMetricsScope: "total" as WatchDataScope,
+  summaryMetricsScope: "filtered" as WatchDataScope,
 } as const;
 
 // ============================================================================
