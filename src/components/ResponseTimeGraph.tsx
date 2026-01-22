@@ -33,46 +33,49 @@ export interface BucketData {
   records: History[];
 }
 
-function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: BucketData }> }) {
-  if (!active || !payload || !payload.length) return null;
+const CustomTooltip = React.forwardRef<HTMLDivElement, { active?: boolean; payload?: Array<{ payload: BucketData }> }>(
+  ({ active, payload }, ref) => {
+    if (!active || !payload || !payload.length) return null;
 
-  const data = payload[0].payload;
-  const statusEntries = Object.entries(data.statusSummary).sort(([a], [b]) => parseInt(a) - parseInt(b));
+    const data = payload[0].payload;
+    const statusEntries = Object.entries(data.statusSummary).sort(([a], [b]) => parseInt(a) - parseInt(b));
 
-  return (
-    <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
-      <p className="text-xs text-muted-foreground mb-1">
-        {format(new Date(data.startDateTime), 'MMM d, HH:mm:ss')}
-      </p>
-      <p className="text-xs text-muted-foreground mb-2">
-        → {format(new Date(data.endDateTime), 'MMM d, HH:mm:ss')}
-      </p>
-      <p className="text-sm font-medium">
-        {getAggregationLabel()}: {data.responseTimeMs.toLocaleString()}ms
-      </p>
-      {statusEntries.length > 0 && (
-        <div className="flex flex-col gap-0.5 my-1">
-          {statusEntries.map(([code, count]) => {
-            const numCode = parseInt(code, 10);
-            const isError = numCode >= 400 || numCode === 0;
-            const isSuccess = numCode >= 200 && numCode < 300;
-            return (
-              <span key={code} className="text-xs font-mono">
-                <span className={isError ? 'text-red-500' : isSuccess ? 'text-green-500' : 'text-yellow-500'}>
-                  {code}
+    return (
+      <div ref={ref} className="bg-popover border border-border rounded-lg p-3 shadow-lg">
+        <p className="text-xs text-muted-foreground mb-1">
+          {format(new Date(data.startDateTime), 'MMM d, HH:mm:ss')}
+        </p>
+        <p className="text-xs text-muted-foreground mb-2">
+          → {format(new Date(data.endDateTime), 'MMM d, HH:mm:ss')}
+        </p>
+        <p className="text-sm font-medium">
+          {getAggregationLabel()}: {data.responseTimeMs.toLocaleString()}ms
+        </p>
+        {statusEntries.length > 0 && (
+          <div className="flex flex-col gap-0.5 my-1">
+            {statusEntries.map(([code, count]) => {
+              const numCode = parseInt(code, 10);
+              const isError = numCode >= 400 || numCode === 0;
+              const isSuccess = numCode >= 200 && numCode < 300;
+              return (
+                <span key={code} className="text-xs font-mono">
+                  <span className={isError ? 'text-red-500' : isSuccess ? 'text-green-500' : 'text-yellow-500'}>
+                    {code}
+                  </span>
+                  <span className="text-muted-foreground"> × {count}</span>
                 </span>
-                <span className="text-muted-foreground"> × {count}</span>
-              </span>
-            );
-          })}
-        </div>
-      )}
-      <p className="text-xs text-muted-foreground">
-        {data.count} request{data.count !== 1 ? 's' : ''}
-      </p>
-    </div>
-  );
-}
+              );
+            })}
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground">
+          {data.count} request{data.count !== 1 ? 's' : ''}
+        </p>
+      </div>
+    );
+  }
+);
+CustomTooltip.displayName = 'CustomTooltip';
 
 export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onDataPointClick }: ResponseTimeGraphProps) {
   // Generate unique ID for this chart instance to avoid gradient conflicts
