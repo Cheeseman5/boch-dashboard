@@ -17,7 +17,7 @@ import type { HistoryFilter } from "@/types/api";
 export const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] = [
   { value: 30, label: "30" },
   { value: 90, label: "90" },
-  { value: 360, label: "360" },
+  { value: 180, label: "180" },
   { value: "all", label: "All" },
 ];
 
