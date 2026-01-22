@@ -37,5 +37,5 @@ export const STOPLIGHT_THRESHOLDS = {
   criticalLatencyMs: 2000,
 
   /** P95 response time (ms) that triggers YELLOW status */
-  warningLatencyMs: 500,
+  warningLatencyMs: 1000,
 } as const;
