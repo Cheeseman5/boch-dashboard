@@ -82,13 +82,21 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   const chartId = React.useId().replace(/:/g, '');
   
   // Defer rendering to avoid "Layout was forced before the page was fully loaded" warning
+  // Use double-rAF to ensure stylesheets have loaded and first paint is complete
   const [isReady, setIsReady] = React.useState(false);
   React.useEffect(() => {
-    // Use requestAnimationFrame to defer until after first paint
-    const rafId = requestAnimationFrame(() => {
-      setIsReady(true);
+    let rafId1: number;
+    let rafId2: number;
+    // Double requestAnimationFrame ensures we wait until after the browser has truly painted
+    rafId1 = requestAnimationFrame(() => {
+      rafId2 = requestAnimationFrame(() => {
+        setIsReady(true);
+      });
     });
-    return () => cancelAnimationFrame(rafId);
+    return () => {
+      cancelAnimationFrame(rafId1);
+      cancelAnimationFrame(rafId2);
+    };
   }, []);
 
   if (isLoading || !isReady) {
