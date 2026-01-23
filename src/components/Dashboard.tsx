@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ApiKeyInput } from './ApiKeyInput';
+import { ApiKeyInput, type ApiHeaderType } from './ApiKeyInput';
 import { GlobalHealth } from './GlobalHealth';
 import { WatchCard } from './WatchCard';
 import { WatchDialog } from './WatchDialog';
@@ -32,11 +32,15 @@ import type {
 import { toast } from '@/hooks/use-toast';
 
 const LOCAL_STORAGE_KEY = 'boch-api-key';
+const HEADER_TYPE_STORAGE_KEY = 'boch-api-header-type';
 const WATCH_ORDER_STORAGE_KEY = 'boch-watch-order';
 const HISTORY_FILTERS_STORAGE_KEY = 'boch-history-filters';
 
 export function Dashboard() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem(LOCAL_STORAGE_KEY) || '');
+  const [headerType, setHeaderType] = useState<ApiHeaderType>(() => 
+    (localStorage.getItem(HEADER_TYPE_STORAGE_KEY) as ApiHeaderType) || 'key'
+  );
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,8 +76,8 @@ export function Dashboard() {
   const fetchWatchData = useCallback(async (watch: Watch): Promise<WatchWithData> => {
     try {
       const [summary, historyResponse] = await Promise.all([
-        getHistorySummary(apiKey, watch.name),
-        getHistory(apiKey, watch.name), // Always fetch all records
+        getHistorySummary(apiKey, watch.name, headerType),
+        getHistory(apiKey, watch.name, headerType), // Always fetch all records
       ]);
 
       const status = calculateWatchStatus(summary, historyResponse.records);
@@ -92,7 +96,7 @@ export function Dashboard() {
         isLoading: false,
       };
     }
-  }, [apiKey]);
+  }, [apiKey, headerType]);
 
   // History filter only affects what is displayed, not what is fetched
   const handleHistoryFilterChange = useCallback((watchName: string, filter: HistoryFilter) => {
@@ -118,7 +122,7 @@ export function Dashboard() {
     setError(null);
 
     try {
-      const watchList = await getWatches(apiKey);
+      const watchList = await getWatches(apiKey, headerType);
       
       // Initialize watches with loading state
       const initialWatches: WatchWithData[] = watchList.map((w) => ({
@@ -159,7 +163,7 @@ export function Dashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [apiKey, fetchWatchData]);
+  }, [apiKey, headerType, fetchWatchData]);
 
   // Auto-refresh on mount if API key exists
   useEffect(() => {
@@ -204,9 +208,9 @@ export function Dashboard() {
     originalName?: string
   ) => {
     if (originalName) {
-      await updateWatch(apiKey, originalName, data as UpdateWatchRequest);
+      await updateWatch(apiKey, originalName, data as UpdateWatchRequest, headerType);
     } else {
-      await addWatch(apiKey, data as AddWatchRequest);
+      await addWatch(apiKey, data as AddWatchRequest, headerType);
     }
     await refreshData();
   };
@@ -224,7 +228,7 @@ export function Dashboard() {
 
   const handleActivateWatch = async (watch: Watch) => {
     try {
-      await updateWatch(apiKey, watch.name, { active: true });
+      await updateWatch(apiKey, watch.name, { active: true }, headerType);
       await refreshData();
     } catch (err) {
       toast({
@@ -240,7 +244,7 @@ export function Dashboard() {
 
     setIsDeleting(true);
     try {
-      await updateWatch(apiKey, deletingWatch, { active: false });
+      await updateWatch(apiKey, deletingWatch, { active: false }, headerType);
       setDeleteDialogOpen(false);
       setDeletingWatch(null);
       await refreshData();
@@ -424,15 +428,17 @@ export function Dashboard() {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-[34rem]">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">API Key</p>
-                    <ApiKeyInput
-                      value={apiKey}
-                      onChange={handleApiKeyChange}
-                      onSubmit={handleConnect}
-                      isLoading={isLoading}
-                    />
-                  </div>
+                  <ApiKeyInput
+                    value={apiKey}
+                    onChange={handleApiKeyChange}
+                    onSubmit={handleConnect}
+                    isLoading={isLoading}
+                    headerType={headerType}
+                    onHeaderTypeChange={(type) => {
+                      setHeaderType(type);
+                      localStorage.setItem(HEADER_TYPE_STORAGE_KEY, type);
+                    }}
+                  />
                 </PopoverContent>
               </Popover>
             </div>
