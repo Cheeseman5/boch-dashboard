@@ -8,11 +8,47 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
-import type { History } from '@/types/api';
+import type { History, StoplightStatus } from '@/types/api';
 import { format } from 'date-fns';
 import { STOPLIGHT_THRESHOLDS } from '@/config/app.config';
 import { getAggregationLabel, aggregateResponseTimes } from '@/lib/stoplight';
 import { getStatusCodeColor, getStatusCodeHslColor } from '@/lib/statusCodeColor';
+
+function getStatusHsl(status: StoplightStatus): string {
+  switch (status) {
+    case 'red':
+      return 'hsl(var(--stoplight-red))';
+    case 'yellow':
+      return 'hsl(var(--stoplight-yellow))';
+    case 'green':
+      return 'hsl(var(--stoplight-green))';
+    default:
+      return 'hsl(var(--muted-foreground))';
+  }
+}
+
+/**
+ * Reduce a bucket's status codes to a single interpreted status, using the same priority as the dashboard:
+ * red > yellow > green (with per-code overrides applied inside getStatusCodeColor).
+ */
+function getBucketInterpretedStatus(statusSummary: Record<number, number> | undefined): StoplightStatus {
+  if (!statusSummary || Object.keys(statusSummary).length === 0) return 'grey';
+
+  let hasYellow = false;
+  let hasGreen = false;
+
+  for (const codeStr of Object.keys(statusSummary)) {
+    const code = parseInt(codeStr, 10);
+    const status = getStatusCodeColor(code);
+    if (status === 'red') return 'red';
+    if (status === 'yellow') hasYellow = true;
+    if (status === 'green') hasGreen = true;
+  }
+
+  if (hasYellow) return 'yellow';
+  if (hasGreen) return 'green';
+  return 'grey';
+}
 
 interface ResponseTimeGraphProps {
   history: History[];
@@ -335,13 +371,16 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                   // Show dot if bucket has errors OR if it's highlighted
                   if (!payload?.hasErrors && !isHighlighted) return <g />;
                   
-                  // Determine dot color based on the highlighted status code
+                  // Determine dot color based on interpreted status code logic
                   const getDotColor = () => {
+                    // When highlighting a specific status code, dot color should match that code.
                     if (isHighlighted && highlightStatusCode !== null) {
                       return getStatusCodeHslColor(highlightStatusCode);
                     }
-                    // Default to red for error dots when not highlighting
-                    return 'hsl(var(--stoplight-red))';
+
+                    // Otherwise, color the dot based on the bucket's interpreted status.
+                    const bucketStatus = getBucketInterpretedStatus(payload?.statusSummary);
+                    return getStatusHsl(bucketStatus);
                   };
                   
                   return (
@@ -359,13 +398,15 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                 activeDot={(props: { cx?: number; cy?: number; payload?: BucketData }) => {
                   const { cx, cy, payload } = props;
                   if (cx === undefined || cy === undefined) return <g />;
-                  const isError = payload?.hasErrors;
+
+                  const bucketStatus = getBucketInterpretedStatus(payload?.statusSummary);
+
                   return (
                     <circle
                       cx={cx}
                       cy={cy}
                       r={4}
-                      fill={isError ? 'hsl(var(--stoplight-red))' : 'hsl(var(--graph-line))'}
+                      fill={getStatusHsl(bucketStatus)}
                       stroke="hsl(var(--background))"
                       strokeWidth={1.5}
                     />
