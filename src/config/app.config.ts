@@ -99,7 +99,7 @@ export const STOPLIGHT_THRESHOLDS = {
    */
   redStatusCodes: [] as number[],
   yellowStatusCodes: [] as number[],
-  greenStatusCodes: [] as number[],
+  greenStatusCodes: [429] as number[],
 } as const;
 
 // ============================================================================
