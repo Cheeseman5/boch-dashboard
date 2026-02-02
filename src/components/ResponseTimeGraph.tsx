@@ -56,14 +56,9 @@ const CustomTooltip = React.forwardRef<HTMLDivElement, { active?: boolean; paylo
           <div className="flex flex-col gap-0.5 my-1">
             {statusEntries.map(([code, count]) => {
               const numCode = parseInt(code, 10);
-              const colorClass = getStatusCodeColor(numCode) === 'red' 
-                ? 'text-red-500' 
-                : getStatusCodeColor(numCode) === 'green' 
-                  ? 'text-green-500' 
-                  : 'text-yellow-500';
               return (
                 <span key={code} className="text-xs font-mono">
-                  <span className={colorClass}>
+                  <span style={{ color: getStatusCodeHslColor(numCode) }}>
                     {code}
                   </span>
                   <span className="text-muted-foreground"> × {count}</span>
