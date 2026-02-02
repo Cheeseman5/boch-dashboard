@@ -14,7 +14,7 @@ import { ResponseTimeGraph, type BucketData } from './ResponseTimeGraph';
 import type { WatchWithData, HistoryFilter, HistorySummaryResponse } from '@/types/api';
 import { cn } from '@/lib/utils';
 import { calculateWatchStatusWithDetails } from '@/lib/stoplight';
-import { getStatusCodeColorClass } from '@/lib/statusCodeColor';
+import { getStatusCodeHslColor } from '@/lib/statusCodeColor';
 import { HISTORY_FILTER_OPTIONS, STOPLIGHT_THRESHOLDS } from '@/config/app.config';
 import { useToast } from '@/hooks/use-toast';
 interface WatchCardProps {
@@ -310,7 +310,7 @@ export function WatchCard({
                         onMouseEnter={() => setHoveredStatusCode(numCode)}
                         onMouseLeave={() => setHoveredStatusCode(null)}
                       >
-                        <span className={getStatusCodeColorClass(numCode)}>
+                        <span style={{ color: getStatusCodeHslColor(numCode) }}>
                           {code}
                         </span>
                         <span className="text-muted-foreground">×{count}</span>
