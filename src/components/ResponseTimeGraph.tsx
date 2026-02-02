@@ -12,6 +12,7 @@ import type { History } from '@/types/api';
 import { format } from 'date-fns';
 import { STOPLIGHT_THRESHOLDS } from '@/config/app.config';
 import { getAggregationLabel, aggregateResponseTimes } from '@/lib/stoplight';
+import { getStatusCodeColor, getStatusCodeHslColor } from '@/lib/statusCodeColor';
 
 interface ResponseTimeGraphProps {
   history: History[];
@@ -55,11 +56,14 @@ const CustomTooltip = React.forwardRef<HTMLDivElement, { active?: boolean; paylo
           <div className="flex flex-col gap-0.5 my-1">
             {statusEntries.map(([code, count]) => {
               const numCode = parseInt(code, 10);
-              const isError = numCode >= 400 || numCode === 0;
-              const isSuccess = numCode >= 200 && numCode < 300;
+              const colorClass = getStatusCodeColor(numCode) === 'red' 
+                ? 'text-red-500' 
+                : getStatusCodeColor(numCode) === 'green' 
+                  ? 'text-green-500' 
+                  : 'text-yellow-500';
               return (
                 <span key={code} className="text-xs font-mono">
-                  <span className={isError ? 'text-red-500' : isSuccess ? 'text-green-500' : 'text-yellow-500'}>
+                  <span className={colorClass}>
                     {code}
                   </span>
                   <span className="text-muted-foreground"> × {count}</span>
@@ -339,12 +343,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                   // Determine dot color based on the highlighted status code
                   const getDotColor = () => {
                     if (isHighlighted && highlightStatusCode !== null) {
-                      const code = highlightStatusCode;
-                      const isError = code >= 400 || code === 0;
-                      const isSuccess = code >= 200 && code < 300;
-                      if (isError) return 'hsl(var(--stoplight-red))';
-                      if (isSuccess) return 'hsl(var(--stoplight-green))';
-                      return 'hsl(var(--stoplight-yellow))';
+                      return getStatusCodeHslColor(highlightStatusCode);
                     }
                     // Default to red for error dots when not highlighting
                     return 'hsl(var(--stoplight-red))';
