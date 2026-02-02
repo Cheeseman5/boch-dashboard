@@ -36,10 +36,14 @@ async function apiRequest<T>(
 ): Promise<T> {
   const headerName = headerType === 'user' ? 'X-RapidAPI-User' : 'X-RapidAPI-Key';
   
+  // Sanitize API key: remove any non-ISO-8859-1 characters that would cause fetch to fail
+  // This handles copy/paste issues with invisible Unicode characters
+  const sanitizedKey = apiKey.replace(/[^\x00-\xFF]/g, '');
+  
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers: {
-      [headerName]: apiKey,
+      [headerName]: sanitizedKey,
       'X-RapidAPI-Host': 'boch.p.rapidapi.com',
       'Content-Type': 'application/json',
       ...options.headers,
