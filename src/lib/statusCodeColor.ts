@@ -6,12 +6,15 @@ import type { StoplightStatus } from '@/types/api';
  * Priority: red > yellow > green > default logic (2xx=green, 4xx/5xx/0=red, else=yellow)
  */
 export function getStatusCodeColor(code: number): StoplightStatus {
-  const { redStatusCodes, yellowStatusCodes, greenStatusCodes } = STOPLIGHT_THRESHOLDS;
+  // Cast to number[] to handle readonly arrays from `as const`
+  const redCodes = STOPLIGHT_THRESHOLDS.redStatusCodes as readonly number[];
+  const yellowCodes = STOPLIGHT_THRESHOLDS.yellowStatusCodes as readonly number[];
+  const greenCodes = STOPLIGHT_THRESHOLDS.greenStatusCodes as readonly number[];
 
   // Check overrides in priority order: red > yellow > green
-  if (redStatusCodes.includes(code)) return 'red';
-  if (yellowStatusCodes.includes(code)) return 'yellow';
-  if (greenStatusCodes.includes(code)) return 'green';
+  if (redCodes.includes(code)) return 'red';
+  if (yellowCodes.includes(code)) return 'yellow';
+  if (greenCodes.includes(code)) return 'green';
 
   // Default logic
   if (code >= 400 || code === 0) return 'red';
