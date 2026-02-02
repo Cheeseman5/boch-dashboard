@@ -59,6 +59,28 @@ function hasFailedResponses(statusSummary: Record<number, number>): boolean {
   });
 }
 
+/**
+ * Check if any status codes in the summary match the override lists.
+ * Returns the override status if found, respecting priority: red > yellow > green.
+ */
+function getStatusCodeOverride(statusSummary: Record<number, number>): StoplightStatus | null {
+  const codes = Object.keys(statusSummary).map((c) => parseInt(c, 10));
+  const { redStatusCodes, yellowStatusCodes, greenStatusCodes } = STOPLIGHT_THRESHOLDS;
+
+  // Priority: red > yellow > green
+  if (codes.some((code) => redStatusCodes.includes(code))) {
+    return 'red';
+  }
+  if (codes.some((code) => yellowStatusCodes.includes(code))) {
+    return 'yellow';
+  }
+  if (codes.some((code) => greenStatusCodes.includes(code))) {
+    return 'green';
+  }
+
+  return null;
+}
+
 function hasMixedStatusCodes(statusSummary: Record<number, number>): boolean {
   const codes = Object.keys(statusSummary).map((c) => parseInt(c, 10));
   const has2xx = codes.some((c) => c >= 200 && c < 300);
@@ -96,6 +118,13 @@ export function calculateWatchStatusWithDetails(
     : summary.responseTime.avg;
 
   const label = getPercentileLabel();
+
+  // Check for status code overrides first (priority: red > yellow > green)
+  const overrideStatus = getStatusCodeOverride(summary.statusSummary);
+  if (overrideStatus) {
+    const overrideCodes = Object.keys(summary.statusSummary).join(', ');
+    return { status: overrideStatus, p95: percentileValue, reason: `Status override: ${overrideCodes}` };
+  }
 
   // Check for failed responses (4xx, 5xx, or 0)
   if (hasFailedResponses(summary.statusSummary)) {

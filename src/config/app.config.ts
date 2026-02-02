@@ -90,6 +90,16 @@ export const STOPLIGHT_THRESHOLDS = {
    * - 'filtered': Metrics reflect only the currently viewed/filtered records
    */
   summaryMetricsScope: "total" as WatchDataScope,
+
+  /**
+   * Status code overrides: Force specific HTTP status codes to be treated as a particular status.
+   * Priority order: red > yellow > green (red overrides yellow/green, yellow overrides green).
+   * Any status code in these lists will bypass normal latency-based status calculation.
+   * Example: redStatusCodes: [500, 502, 503] forces those codes to always show red.
+   */
+  redStatusCodes: [] as number[],
+  yellowStatusCodes: [] as number[],
+  greenStatusCodes: [] as number[],
 } as const;
 
 // ============================================================================
