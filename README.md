@@ -5,6 +5,8 @@ A real-time system health monitoring dashboard integrated with the BOCH API via 
 ![Dashboard Preview](src/assets/logo.png)
 
 ---
+[Live version](https://breath-of-boch.lovable.app)
+---
 
 ## Quick Setup
 
