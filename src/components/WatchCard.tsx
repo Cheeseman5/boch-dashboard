@@ -310,7 +310,10 @@ export function WatchCard({
                         onMouseEnter={() => setHoveredStatusCode(numCode)}
                         onMouseLeave={() => setHoveredStatusCode(null)}
                       >
-                        <span style={{ color: getStatusCodeHslColor(numCode) }}>
+                        <span 
+                          style={{ color: getStatusCodeHslColor(numCode) }}
+                          className={cn(hoveredStatusCode === numCode && "font-bold brightness-125 drop-shadow-[0_0_4px_currentColor]")}
+                        >
                           {code}
                         </span>
                         <span className={cn("text-muted-foreground", hoveredStatusCode === numCode && "text-foreground")}>×{count}</span>
