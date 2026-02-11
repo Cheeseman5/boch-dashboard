@@ -305,7 +305,7 @@ export function WatchCard({
                         key={code} 
                         className={cn(
                           "flex justify-between items-center gap-1 text-xs font-mono leading-tight cursor-pointer rounded px-0.5 transition-colors",
-                          hoveredStatusCode === numCode && "bg-accent"
+                          hoveredStatusCode === numCode && "bg-accent ring-1 ring-border"
                         )}
                         onMouseEnter={() => setHoveredStatusCode(numCode)}
                         onMouseLeave={() => setHoveredStatusCode(null)}
@@ -313,7 +313,7 @@ export function WatchCard({
                         <span style={{ color: getStatusCodeHslColor(numCode) }}>
                           {code}
                         </span>
-                        <span className="text-muted-foreground">×{count}</span>
+                        <span className={cn("text-muted-foreground", hoveredStatusCode === numCode && "text-foreground")}>×{count}</span>
                       </div>
                     );
                   })
