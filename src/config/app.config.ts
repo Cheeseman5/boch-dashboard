@@ -82,14 +82,14 @@ export const STOPLIGHT_THRESHOLDS = {
    * - 'total': Status reflects the entire watch history (default behavior)
    * - 'filtered': Status reflects only the currently viewed/filtered records
    */
-  watchStatusScope: "total" as WatchDataScope,
+  watchStatusScope: "filtered" as WatchDataScope,
 
   /**
    * Data scope for watch-level SUMMARY METRICS (Min, Avg, Max values).
    * - 'total': Metrics reflect the entire watch history
    * - 'filtered': Metrics reflect only the currently viewed/filtered records
    */
-  summaryMetricsScope: "total" as WatchDataScope,
+  summaryMetricsScope: "filtered" as WatchDataScope,
 
   /**
    * Status code overrides: Force specific HTTP status codes to be treated as a particular status.
