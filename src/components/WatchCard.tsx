@@ -220,7 +220,7 @@ export function WatchCard({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="min-w-[80px]">
-                {HISTORY_FILTER_OPTIONS.map((option) => (
+                {HISTORY_FILTER_HOURS_OPTIONS.map((option) => (
                   <DropdownMenuItem
                     key={option.value}
                     onClick={() => onHistoryFilterChange(option.value)}
@@ -232,6 +232,29 @@ export function WatchCard({
                     {option.label}
                   </DropdownMenuItem>
                 ))}
+                <DropdownMenuSeparator />
+                {HISTORY_FILTER_COUNT_OPTIONS.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => onHistoryFilterChange(option.value)}
+                    className={cn(
+                      'text-xs cursor-pointer',
+                      historyFilter === option.value && 'bg-accent'
+                    )}
+                  >
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => onHistoryFilterChange('all')}
+                  className={cn(
+                    'text-xs cursor-pointer',
+                    historyFilter === 'all' && 'bg-accent'
+                  )}
+                >
+                  All
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <span className="text-xs text-muted-foreground">
