@@ -464,12 +464,31 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
         </div>
       </div>
       
-      {/* X-axis label with bounds */}
-      <div className="flex items-center justify-between pl-8 shrink-0">
-        <span className="text-[9px] text-muted-foreground truncate">
+      {/* X-axis labels with time boundaries */}
+      <div className="relative pl-8 shrink-0 h-3">
+        {/* First date */}
+        <span className="absolute left-8 text-[9px] text-muted-foreground truncate">
           {firstDate ? format(new Date(firstDate), 'MMM d, HH:mm') : ''}
         </span>
-        <span className="text-[9px] text-muted-foreground truncate">
+        {/* Time boundary labels - positioned proportionally */}
+        {timeBoundaries.map((b) => {
+          const pct = lastTimestamp > firstTimestamp
+            ? ((b.timestamp - firstTimestamp) / (lastTimestamp - firstTimestamp)) * 100
+            : 50;
+          // Skip labels too close to edges (within 8%)
+          if (pct < 8 || pct > 92) return null;
+          return (
+            <span
+              key={b.timestamp}
+              className="absolute text-[8px] text-muted-foreground/60 -translate-x-1/2 whitespace-nowrap"
+              style={{ left: `calc(2rem + ${pct}% * (100% - 2rem) / 100%)`, left: `${pct}%`, marginLeft: '2rem' }}
+            >
+              {b.label}
+            </span>
+          );
+        })}
+        {/* Last date */}
+        <span className="absolute right-0 text-[9px] text-muted-foreground truncate">
           {lastDate ? format(new Date(lastDate), 'MMM d, HH:mm') : ''}
         </span>
       </div>
