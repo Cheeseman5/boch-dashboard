@@ -62,12 +62,37 @@ interface ResponseTimeGraphProps {
 export interface BucketData {
   startDateTime: string;
   endDateTime: string;
+  timestamp: number; // midpoint timestamp for X positioning
   responseTimeMs: number;
   count: number;
   statusSummary: Record<number, number>;
   hasErrors: boolean;
   /** Original history records in this bucket */
   records: History[];
+}
+
+/** Calculate hour and day boundary timestamps within a time range */
+function getTimeBoundaries(startMs: number, endMs: number) {
+  const boundaries: { timestamp: number; label: string; isDay: boolean }[] = [];
+  
+  // Find first hour boundary after start
+  const firstHour = new Date(startMs);
+  firstHour.setMinutes(0, 0, 0);
+  if (firstHour.getTime() <= startMs) {
+    firstHour.setHours(firstHour.getHours() + 1);
+  }
+  
+  for (let t = firstHour.getTime(); t < endMs; t += 60 * 60 * 1000) {
+    const d = new Date(t);
+    const isDay = d.getHours() === 0;
+    boundaries.push({
+      timestamp: t,
+      label: isDay ? format(d, 'MMM d') : format(d, 'HH:mm'),
+      isDay,
+    });
+  }
+  
+  return boundaries;
 }
 
 const CustomTooltip = React.forwardRef<HTMLDivElement, { active?: boolean; payload?: Array<{ payload: BucketData }> }>(
@@ -182,12 +207,15 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
       return acc;
     }, {} as Record<number, number>);
 
-    // Check if any status code in this bucket is an error (4xx, 5xx, or 0)
     const hasErrors = bucket.some((h) => h.statusCode >= 400 || h.statusCode === 0);
+    
+    const startMs = new Date(bucket[0].dateTime).getTime();
+    const endMs = new Date(bucket[bucket.length - 1].dateTime).getTime();
     
     chartData.push({
       startDateTime: bucket[0].dateTime,
       endDateTime: bucket[bucket.length - 1].dateTime,
+      timestamp: Math.round((startMs + endMs) / 2),
       responseTimeMs: aggregateResponseTimes(responseTimes),
       count: bucket.length,
       statusSummary,
@@ -203,6 +231,11 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   
   const firstDate = chartData[0]?.startDateTime;
   const lastDate = chartData[chartData.length - 1]?.endDateTime;
+  
+  // Calculate time boundaries for vertical grid lines
+  const firstTimestamp = chartData[0]?.timestamp ?? 0;
+  const lastTimestamp = chartData[chartData.length - 1]?.timestamp ?? 0;
+  const timeBoundaries = getTimeBoundaries(firstTimestamp, lastTimestamp);
 
   // Threshold values from centralized config
   const YELLOW_THRESHOLD = STOPLIGHT_THRESHOLDS.warningLatencyMs;
@@ -310,7 +343,9 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                 </linearGradient>
               </defs>
               <XAxis 
-                dataKey="dateTime" 
+                dataKey="timestamp" 
+                type="number"
+                domain={[firstTimestamp, lastTimestamp]}
                 hide 
                 axisLine={false}
                 tickLine={false}
@@ -353,6 +388,17 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                   strokeDasharray="4 4"
                 />
               )}
+              {/* Vertical time boundary lines */}
+              {timeBoundaries.map((b) => (
+                <ReferenceLine
+                  key={b.timestamp}
+                  x={b.timestamp}
+                  stroke="hsl(var(--border))"
+                  strokeWidth={b.isDay ? 1 : 0.5}
+                  strokeOpacity={b.isDay ? 0.5 : 0.25}
+                  strokeDasharray={b.isDay ? '4 2' : '2 3'}
+                />
+              ))}
               <Area
                 type="monotone"
                 dataKey="responseTimeMs"
@@ -418,12 +464,31 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
         </div>
       </div>
       
-      {/* X-axis label with bounds */}
-      <div className="flex items-center justify-between pl-8 shrink-0">
-        <span className="text-[9px] text-muted-foreground truncate">
+      {/* X-axis labels with time boundaries */}
+      <div className="relative pl-8 shrink-0 h-3">
+        {/* First date */}
+        <span className="absolute left-8 text-[9px] text-muted-foreground truncate">
           {firstDate ? format(new Date(firstDate), 'MMM d, HH:mm') : ''}
         </span>
-        <span className="text-[9px] text-muted-foreground truncate">
+        {/* Time boundary labels - positioned proportionally */}
+        {timeBoundaries.map((b) => {
+          const pct = lastTimestamp > firstTimestamp
+            ? ((b.timestamp - firstTimestamp) / (lastTimestamp - firstTimestamp)) * 100
+            : 50;
+          // Skip labels too close to edges (within 8%)
+          if (pct < 8 || pct > 92) return null;
+          return (
+            <span
+              key={b.timestamp}
+              className="absolute text-[8px] text-muted-foreground/60 -translate-x-1/2 whitespace-nowrap"
+              style={{ left: `calc(2rem + ${pct * 0.01} * (100% - 2rem))`, transform: 'translateX(-50%)' }}
+            >
+              {b.label}
+            </span>
+          );
+        })}
+        {/* Last date */}
+        <span className="absolute right-0 text-[9px] text-muted-foreground truncate">
           {lastDate ? format(new Date(lastDate), 'MMM d, HH:mm') : ''}
         </span>
       </div>
