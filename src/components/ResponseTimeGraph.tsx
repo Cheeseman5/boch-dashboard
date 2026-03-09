@@ -80,14 +80,11 @@ function getTimeBoundaries(startMs: number, endMs: number) {
   
   // Determine which hours to include based on span
   const shouldIncludeHour = (hour: number): boolean => {
-    if (spanHours <= 48) {
-      // Show every hour
+    if (spanHours <= 36) {
       return true;
     } else if (spanHours <= 96) {
-      // 2-4 days: show every 3 hours (0, 3, 6, 9, 12, 15, 18, 21)
       return hour % 3 === 0;
     } else {
-      // >4 days: only show noon (12)
       return hour === 12;
     }
   };
