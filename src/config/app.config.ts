@@ -12,18 +12,48 @@
 // - value: The filter value (number = last N records, 'all' = show all)
 // - label: Display text shown in the dropdown
 
-export const HISTORY_FILTER_OPTIONS = [
+// Hour-based filter options (filter by time window)
+export const HISTORY_FILTER_HOURS_OPTIONS = [
+  { value: "1H", label: "1H" },
+  { value: "3H", label: "3H" },
+  { value: "6H", label: "6H" },
+  { value: "12H", label: "12H" },
+  { value: "24H", label: "24H" },
+  { value: "48H", label: "48H" },
+] as const;
+
+// Record-count-based filter options (filter by last N records)
+export const HISTORY_FILTER_COUNT_OPTIONS = [
   { value: 30, label: "30" },
   { value: 90, label: "90" },
   { value: 180, label: "180" },
   { value: 400, label: "400" },
   { value: 1000, label: "1000" },
   { value: 5000, label: "5000" },
-  { value: "all", label: "All" },
 ] as const;
 
-// Type derived from the options array above (single source of truth)
-export type HistoryFilter = (typeof HISTORY_FILTER_OPTIONS)[number]["value"];
+// Combined options (used for label lookups, etc.)
+export const HISTORY_FILTER_OPTIONS = [
+  ...HISTORY_FILTER_HOURS_OPTIONS,
+  ...HISTORY_FILTER_COUNT_OPTIONS,
+  { value: "all" as const, label: "All" },
+] as const;
+
+// Type for hour-based filters like "1H", "3H", etc.
+export type HourFilter = (typeof HISTORY_FILTER_HOURS_OPTIONS)[number]["value"];
+
+// Combined filter type
+export type HistoryFilter = number | "all" | HourFilter;
+
+// Helper to check if a filter is hour-based
+export function isHourFilter(filter: HistoryFilter): filter is HourFilter {
+  return typeof filter === "string" && /^\d{1,3}[Hh]$/.test(filter);
+}
+
+// Parse hour value from an hour filter string
+export function parseHourFilter(filter: HourFilter): number {
+  return parseInt(filter.replace(/[Hh]$/, ""), 10);
+}
 
 // Default filter applied to new watches
 export const DEFAULT_HISTORY_FILTER: HistoryFilter = 30;
