@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Stoplight } from './Stoplight';
@@ -15,7 +16,7 @@ import type { WatchWithData, HistoryFilter, HistorySummaryResponse } from '@/typ
 import { cn } from '@/lib/utils';
 import { calculateWatchStatusWithDetails } from '@/lib/stoplight';
 import { getStatusCodeHslColor } from '@/lib/statusCodeColor';
-import { HISTORY_FILTER_OPTIONS, STOPLIGHT_THRESHOLDS } from '@/config/app.config';
+import { HISTORY_FILTER_HOURS_OPTIONS, HISTORY_FILTER_COUNT_OPTIONS, HISTORY_FILTER_OPTIONS, STOPLIGHT_THRESHOLDS, isHourFilter, parseHourFilter } from '@/config/app.config';
 import { useToast } from '@/hooks/use-toast';
 interface WatchCardProps {
   watch: WatchWithData;
@@ -74,9 +75,16 @@ export function WatchCard({
   const filterLabel = HISTORY_FILTER_OPTIONS.find(o => o.value === historyFilter)?.label ?? 'All';
 
   // Filter history client-side based on the selected filter
-  const filteredHistory = historyFilter === 'all' 
-    ? history 
-    : history?.slice(-historyFilter);
+  const filteredHistory = (() => {
+    if (!history) return history;
+    if (historyFilter === 'all') return history;
+    if (isHourFilter(historyFilter)) {
+      const hours = parseHourFilter(historyFilter);
+      const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+      return history.filter(h => new Date(h.dateTime) >= cutoff);
+    }
+    return history.slice(-historyFilter);
+  })();
 
   // Calculate status based on filtered data
   const filteredSummary: HistorySummaryResponse | undefined = filteredHistory && filteredHistory.length > 0 && summary
@@ -212,7 +220,7 @@ export function WatchCard({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="min-w-[80px]">
-                {HISTORY_FILTER_OPTIONS.map((option) => (
+                {HISTORY_FILTER_HOURS_OPTIONS.map((option) => (
                   <DropdownMenuItem
                     key={option.value}
                     onClick={() => onHistoryFilterChange(option.value)}
@@ -224,6 +232,29 @@ export function WatchCard({
                     {option.label}
                   </DropdownMenuItem>
                 ))}
+                <DropdownMenuSeparator />
+                {HISTORY_FILTER_COUNT_OPTIONS.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => onHistoryFilterChange(option.value)}
+                    className={cn(
+                      'text-xs cursor-pointer',
+                      historyFilter === option.value && 'bg-accent'
+                    )}
+                  >
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => onHistoryFilterChange('all')}
+                  className={cn(
+                    'text-xs cursor-pointer',
+                    historyFilter === 'all' && 'bg-accent'
+                  )}
+                >
+                  All
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <span className="text-xs text-muted-foreground">
