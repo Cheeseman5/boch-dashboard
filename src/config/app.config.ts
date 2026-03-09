@@ -12,10 +12,10 @@
 // - value: The filter value (number = last N records, 'all' = show all)
 // - label: Display text shown in the dropdown
 
-// Hour-based filter options (filter by time window)
+// Time-based filter options (filter by time window, using H for hours or M for minutes)
 export const HISTORY_FILTER_HOURS_OPTIONS = [
   { value: "1H", label: "1H" },
-  { value: "1.5H", label: "1.5H" },
+  { value: "90M", label: "90M" },
   { value: "2H", label: "2H" },
   { value: "12H", label: "12H" },
   { value: "24H", label: "24H" },
@@ -39,20 +39,28 @@ export const HISTORY_FILTER_OPTIONS = [
   { value: "all" as const, label: "All" },
 ] as const;
 
-// Type for hour-based filters like "1H", "3H", etc.
+// Type for time-based filters like "1H", "90M", etc.
 export type HourFilter = (typeof HISTORY_FILTER_HOURS_OPTIONS)[number]["value"];
 
 // Combined filter type
 export type HistoryFilter = number | "all" | HourFilter;
 
-// Helper to check if a filter is hour-based
+// Helper to check if a filter is time-based (hours or minutes)
 export function isHourFilter(filter: HistoryFilter): filter is HourFilter {
-  return typeof filter === "string" && /^\d{1,3}[Hh]$/.test(filter);
+  return typeof filter === "string" && /^\d+(\.\d+)?[HhMm]$/.test(filter);
 }
 
-// Parse hour value from an hour filter string
+// Parse a time filter string into minutes
+export function parseFilterToMinutes(filter: HourFilter): number {
+  if (/[Mm]$/.test(filter)) {
+    return parseFloat(filter.replace(/[Mm]$/, ""));
+  }
+  return parseFloat(filter.replace(/[Hh]$/, "")) * 60;
+}
+
+// Parse hour value from a time filter string (returns hours for backward compat)
 export function parseHourFilter(filter: HourFilter): number {
-  return parseInt(filter.replace(/[Hh]$/, ""), 10);
+  return parseFilterToMinutes(filter) / 60;
 }
 
 // Default filter applied to new watches
