@@ -72,7 +72,7 @@ export interface BucketData {
 }
 
 /** Clean hour intervals to snap to */
-const HOUR_INTERVALS = [1, 2, 3, 6, 12, 24];
+const MINUTE_INTERVALS = [15, 30, 60, 120, 180, 360, 720, 1440];
 const TARGET_LABELS = 10;
 
 /** Calculate hour and day boundary timestamps within a time range.
@@ -82,24 +82,25 @@ function getTimeBoundaries(startMs: number, endMs: number) {
   const boundaries: { timestamp: number; label: string; isDay: boolean }[] = [];
   const spanHours = (endMs - startMs) / (60 * 60 * 1000);
   
-  // Pick the smallest clean interval that yields ≤ TARGET_LABELS
-  const idealInterval = spanHours / TARGET_LABELS;
-  const hourInterval = HOUR_INTERVALS.find(i => i >= idealInterval) ?? 24;
+  // Pick the smallest clean interval (in minutes) that yields ≤ TARGET_LABELS
+  const spanMinutes = (endMs - startMs) / (60 * 1000);
+  const idealInterval = spanMinutes / TARGET_LABELS;
+  const minuteInterval = MINUTE_INTERVALS.find(i => i >= idealInterval) ?? 1440;
   
-  // Find first aligned hour boundary after start
-  const firstHour = new Date(startMs);
-  firstHour.setMinutes(0, 0, 0);
-  if (firstHour.getTime() <= startMs) {
-    firstHour.setHours(firstHour.getHours() + 1);
-  }
+  // Find first aligned boundary after start
+  const first = new Date(startMs);
+  first.setSeconds(0, 0);
+  // Align to next interval boundary
+  const currentMinutes = first.getHours() * 60 + first.getMinutes();
+  const nextAligned = Math.ceil((currentMinutes + 1) / minuteInterval) * minuteInterval;
+  first.setHours(0, 0, 0, 0);
+  const startAligned = first.getTime() + nextAligned * 60 * 1000;
   
-  for (let t = firstHour.getTime(); t < endMs; t += 60 * 60 * 1000) {
+  for (let t = startAligned; t < endMs; t += minuteInterval * 60 * 1000) {
     const d = new Date(t);
     const hour = d.getHours();
-    const isDay = hour === 0;
-    
-    // Always include day boundaries; otherwise only include if aligned to interval
-    if (!isDay && hour % hourInterval !== 0) continue;
+    const minute = d.getMinutes();
+    const isDay = hour === 0 && minute === 0;
     
     boundaries.push({
       timestamp: t,
