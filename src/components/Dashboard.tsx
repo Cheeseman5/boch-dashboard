@@ -209,10 +209,36 @@ export function Dashboard() {
   ) => {
     if (originalName) {
       await updateWatch(apiKey, originalName, data as UpdateWatchRequest, headerType);
+      // Re-fetch only the updated watch
+      const watchList = await getWatches(apiKey, headerType);
+      const updatedDef = watchList.find(w => w.name === (data as UpdateWatchRequest).name || w.name === originalName);
+      if (updatedDef) {
+        const watchWithData = await fetchWatchData(updatedDef);
+        setWatches(prev => prev.map(w => w.name === originalName ? watchWithData : w));
+        // Update order if name changed
+        if ((data as UpdateWatchRequest).name && (data as UpdateWatchRequest).name !== originalName) {
+          setWatchOrder(prev => {
+            const updated = prev.map(n => n === originalName ? (data as UpdateWatchRequest).name! : n);
+            localStorage.setItem(WATCH_ORDER_STORAGE_KEY, JSON.stringify(updated));
+            return updated;
+          });
+        }
+      }
     } else {
       await addWatch(apiKey, data as AddWatchRequest, headerType);
+      // Fetch the new watch and append it
+      const watchList = await getWatches(apiKey, headerType);
+      const newDef = watchList.find(w => w.name === (data as AddWatchRequest).name);
+      if (newDef) {
+        const watchWithData = await fetchWatchData(newDef);
+        setWatches(prev => [...prev, watchWithData]);
+        setWatchOrder(prev => {
+          const updated = [...prev, newDef.name];
+          localStorage.setItem(WATCH_ORDER_STORAGE_KEY, JSON.stringify(updated));
+          return updated;
+        });
+      }
     }
-    await refreshData();
   };
 
   const handleToggleActiveClick = (watch: Watch) => {
@@ -229,7 +255,9 @@ export function Dashboard() {
   const handleActivateWatch = async (watch: Watch) => {
     try {
       await updateWatch(apiKey, watch.name, { active: true }, headerType);
-      await refreshData();
+      // Re-fetch only this watch
+      const watchWithData = await fetchWatchData({ ...watch, active: true });
+      setWatches(prev => prev.map(w => w.name === watch.name ? watchWithData : w));
     } catch (err) {
       toast({
         title: 'Error',
@@ -246,8 +274,9 @@ export function Dashboard() {
     try {
       await updateWatch(apiKey, deletingWatch, { active: false }, headerType);
       setDeleteDialogOpen(false);
+      // Update only the affected watch's active state
+      setWatches(prev => prev.map(w => w.name === deletingWatch ? { ...w, active: false } : w));
       setDeletingWatch(null);
-      await refreshData();
     } catch (err) {
       toast({
         title: 'Error',
