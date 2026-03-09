@@ -362,4 +362,4 @@ export const WatchCard = memo(function WatchCard({
       </CardContent>
     </Card>
   );
-}
+});

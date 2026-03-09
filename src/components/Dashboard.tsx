@@ -274,8 +274,9 @@ export function Dashboard() {
     try {
       await updateWatch(apiKey, deletingWatch, { active: false }, headerType);
       setDeleteDialogOpen(false);
+      // Update only the affected watch's active state
+      setWatches(prev => prev.map(w => w.name === deletingWatch ? { ...w, active: false } : w));
       setDeletingWatch(null);
-      await refreshData();
     } catch (err) {
       toast({
         title: 'Error',
