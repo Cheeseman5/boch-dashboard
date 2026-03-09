@@ -343,7 +343,9 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                 </linearGradient>
               </defs>
               <XAxis 
-                dataKey="dateTime" 
+                dataKey="timestamp" 
+                type="number"
+                domain={[firstTimestamp, lastTimestamp]}
                 hide 
                 axisLine={false}
                 tickLine={false}
