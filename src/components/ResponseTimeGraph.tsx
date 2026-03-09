@@ -71,25 +71,22 @@ export interface BucketData {
   records: History[];
 }
 
+/** Clean hour intervals to snap to */
+const HOUR_INTERVALS = [1, 2, 3, 6, 12, 24];
+const TARGET_LABELS = 10;
+
 /** Calculate hour and day boundary timestamps within a time range.
- *  Density adapts to span: ≤48h → every hour, 2-4 days → 3h increments, >4 days → noon only.
+ *  Dynamically picks a clean hour interval to target ~10 labels.
  */
 function getTimeBoundaries(startMs: number, endMs: number) {
   const boundaries: { timestamp: number; label: string; isDay: boolean }[] = [];
   const spanHours = (endMs - startMs) / (60 * 60 * 1000);
   
-  // Determine which hours to include based on span
-  const shouldIncludeHour = (hour: number): boolean => {
-    if (spanHours <= 36) {
-      return true;
-    } else if (spanHours <= 96) {
-      return hour % 3 === 0;
-    } else {
-      return hour === 12;
-    }
-  };
+  // Pick the smallest clean interval that yields ≤ TARGET_LABELS
+  const idealInterval = spanHours / TARGET_LABELS;
+  const hourInterval = HOUR_INTERVALS.find(i => i >= idealInterval) ?? 24;
   
-  // Find first hour boundary after start
+  // Find first aligned hour boundary after start
   const firstHour = new Date(startMs);
   firstHour.setMinutes(0, 0, 0);
   if (firstHour.getTime() <= startMs) {
@@ -101,7 +98,8 @@ function getTimeBoundaries(startMs: number, endMs: number) {
     const hour = d.getHours();
     const isDay = hour === 0;
     
-    if (!isDay && !shouldIncludeHour(hour)) continue;
+    // Always include day boundaries; otherwise only include if aligned to interval
+    if (!isDay && hour % hourInterval !== 0) continue;
     
     boundaries.push({
       timestamp: t,
