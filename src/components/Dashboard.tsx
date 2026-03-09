@@ -255,7 +255,9 @@ export function Dashboard() {
   const handleActivateWatch = async (watch: Watch) => {
     try {
       await updateWatch(apiKey, watch.name, { active: true }, headerType);
-      await refreshData();
+      // Re-fetch only this watch
+      const watchWithData = await fetchWatchData({ ...watch, active: true });
+      setWatches(prev => prev.map(w => w.name === watch.name ? watchWithData : w));
     } catch (err) {
       toast({
         title: 'Error',
