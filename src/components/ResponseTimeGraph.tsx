@@ -72,7 +72,7 @@ export interface BucketData {
 }
 
 /** Clean hour intervals to snap to */
-const HOUR_INTERVALS = [1, 2, 3, 6, 12, 24];
+const MINUTE_INTERVALS = [15, 30, 60, 120, 180, 360, 720, 1440];
 const TARGET_LABELS = 10;
 
 /** Calculate hour and day boundary timestamps within a time range.
