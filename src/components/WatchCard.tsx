@@ -75,9 +75,16 @@ export function WatchCard({
   const filterLabel = HISTORY_FILTER_OPTIONS.find(o => o.value === historyFilter)?.label ?? 'All';
 
   // Filter history client-side based on the selected filter
-  const filteredHistory = historyFilter === 'all' 
-    ? history 
-    : history?.slice(-historyFilter);
+  const filteredHistory = (() => {
+    if (!history) return history;
+    if (historyFilter === 'all') return history;
+    if (isHourFilter(historyFilter)) {
+      const hours = parseHourFilter(historyFilter);
+      const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+      return history.filter(h => new Date(h.dateTime) >= cutoff);
+    }
+    return history.slice(-historyFilter);
+  })();
 
   // Calculate status based on filtered data
   const filteredSummary: HistorySummaryResponse | undefined = filteredHistory && filteredHistory.length > 0 && summary
