@@ -33,7 +33,7 @@ interface WatchCardProps {
   onDrop?: (e: React.DragEvent) => void;
 }
 
-export function WatchCard({ 
+export const WatchCard = memo(function WatchCard({ 
   watch, 
   historyFilter,
   onHistoryFilterChange,
