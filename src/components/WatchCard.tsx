@@ -16,7 +16,7 @@ import type { WatchWithData, HistoryFilter, HistorySummaryResponse } from '@/typ
 import { cn } from '@/lib/utils';
 import { calculateWatchStatusWithDetails } from '@/lib/stoplight';
 import { getStatusCodeHslColor } from '@/lib/statusCodeColor';
-import { HISTORY_FILTER_OPTIONS, STOPLIGHT_THRESHOLDS } from '@/config/app.config';
+import { HISTORY_FILTER_HOURS_OPTIONS, HISTORY_FILTER_COUNT_OPTIONS, HISTORY_FILTER_OPTIONS, STOPLIGHT_THRESHOLDS, isHourFilter, parseHourFilter } from '@/config/app.config';
 import { useToast } from '@/hooks/use-toast';
 interface WatchCardProps {
   watch: WatchWithData;
