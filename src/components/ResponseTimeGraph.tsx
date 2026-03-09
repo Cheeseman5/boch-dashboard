@@ -388,6 +388,17 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                   strokeDasharray="4 4"
                 />
               )}
+              {/* Vertical time boundary lines */}
+              {timeBoundaries.map((b) => (
+                <ReferenceLine
+                  key={b.timestamp}
+                  x={b.timestamp}
+                  stroke="hsl(var(--border))"
+                  strokeWidth={b.isDay ? 1 : 0.5}
+                  strokeOpacity={b.isDay ? 0.5 : 0.25}
+                  strokeDasharray={b.isDay ? '4 2' : '2 3'}
+                />
+              ))}
               <Area
                 type="monotone"
                 dataKey="responseTimeMs"
