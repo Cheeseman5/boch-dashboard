@@ -71,9 +71,26 @@ export interface BucketData {
   records: History[];
 }
 
-/** Calculate hour and day boundary timestamps within a time range */
+/** Calculate hour and day boundary timestamps within a time range.
+ *  Density adapts to span: ≤48h → every hour, 2-4 days → 3h increments, >4 days → noon only.
+ */
 function getTimeBoundaries(startMs: number, endMs: number) {
   const boundaries: { timestamp: number; label: string; isDay: boolean }[] = [];
+  const spanHours = (endMs - startMs) / (60 * 60 * 1000);
+  
+  // Determine which hours to include based on span
+  const shouldIncludeHour = (hour: number): boolean => {
+    if (spanHours <= 48) {
+      // Show every hour
+      return true;
+    } else if (spanHours <= 96) {
+      // 2-4 days: show every 3 hours (0, 3, 6, 9, 12, 15, 18, 21)
+      return hour % 3 === 0;
+    } else {
+      // >4 days: only show noon (12)
+      return hour === 12;
+    }
+  };
   
   // Find first hour boundary after start
   const firstHour = new Date(startMs);
@@ -84,7 +101,11 @@ function getTimeBoundaries(startMs: number, endMs: number) {
   
   for (let t = firstHour.getTime(); t < endMs; t += 60 * 60 * 1000) {
     const d = new Date(t);
-    const isDay = d.getHours() === 0;
+    const hour = d.getHours();
+    const isDay = hour === 0;
+    
+    if (!isDay && !shouldIncludeHour(hour)) continue;
+    
     boundaries.push({
       timestamp: t,
       label: isDay ? format(d, 'MMM d') : format(d, 'HH:mm'),
