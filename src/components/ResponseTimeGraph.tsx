@@ -207,12 +207,15 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
       return acc;
     }, {} as Record<number, number>);
 
-    // Check if any status code in this bucket is an error (4xx, 5xx, or 0)
     const hasErrors = bucket.some((h) => h.statusCode >= 400 || h.statusCode === 0);
+    
+    const startMs = new Date(bucket[0].dateTime).getTime();
+    const endMs = new Date(bucket[bucket.length - 1].dateTime).getTime();
     
     chartData.push({
       startDateTime: bucket[0].dateTime,
       endDateTime: bucket[bucket.length - 1].dateTime,
+      timestamp: Math.round((startMs + endMs) / 2),
       responseTimeMs: aggregateResponseTimes(responseTimes),
       count: bucket.length,
       statusSummary,
