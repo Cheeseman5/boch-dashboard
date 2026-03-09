@@ -62,12 +62,37 @@ interface ResponseTimeGraphProps {
 export interface BucketData {
   startDateTime: string;
   endDateTime: string;
+  timestamp: number; // midpoint timestamp for X positioning
   responseTimeMs: number;
   count: number;
   statusSummary: Record<number, number>;
   hasErrors: boolean;
   /** Original history records in this bucket */
   records: History[];
+}
+
+/** Calculate hour and day boundary timestamps within a time range */
+function getTimeBoundaries(startMs: number, endMs: number) {
+  const boundaries: { timestamp: number; label: string; isDay: boolean }[] = [];
+  
+  // Find first hour boundary after start
+  const firstHour = new Date(startMs);
+  firstHour.setMinutes(0, 0, 0);
+  if (firstHour.getTime() <= startMs) {
+    firstHour.setHours(firstHour.getHours() + 1);
+  }
+  
+  for (let t = firstHour.getTime(); t < endMs; t += 60 * 60 * 1000) {
+    const d = new Date(t);
+    const isDay = d.getHours() === 0;
+    boundaries.push({
+      timestamp: t,
+      label: isDay ? format(d, 'MMM d') : format(d, 'HH:mm'),
+      isDay,
+    });
+  }
+  
+  return boundaries;
 }
 
 const CustomTooltip = React.forwardRef<HTMLDivElement, { active?: boolean; payload?: Array<{ payload: BucketData }> }>(
