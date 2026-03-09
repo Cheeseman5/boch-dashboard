@@ -231,6 +231,11 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   
   const firstDate = chartData[0]?.startDateTime;
   const lastDate = chartData[chartData.length - 1]?.endDateTime;
+  
+  // Calculate time boundaries for vertical grid lines
+  const firstTimestamp = chartData[0]?.timestamp ?? 0;
+  const lastTimestamp = chartData[chartData.length - 1]?.timestamp ?? 0;
+  const timeBoundaries = getTimeBoundaries(firstTimestamp, lastTimestamp);
 
   // Threshold values from centralized config
   const YELLOW_THRESHOLD = STOPLIGHT_THRESHOLDS.warningLatencyMs;
