@@ -83,7 +83,9 @@ export function WatchCard({
       const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
       return history.filter(h => new Date(h.dateTime) >= cutoff);
     }
-    return history.slice(-historyFilter);
+    // Sort by dateTime descending, take first N (most recent), then reverse for chronological order
+    const sorted = [...history].sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
+    return sorted.slice(0, historyFilter).reverse();
   })();
 
   // Calculate status based on filtered data
