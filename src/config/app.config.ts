@@ -27,8 +27,8 @@ export const HISTORY_FILTER_HOURS_OPTIONS = [
 
 // Record-count-based filter options (filter by last N records)
 export const HISTORY_FILTER_COUNT_OPTIONS = [
-  { value: 1000, label: "1000" },
-  { value: 2000, label: "2000" },
+  //{ value: 1000, label: "1000" },
+  //{ value: 2000, label: "2000" },
 ] as const;
 
 // Combined options (used for label lookups, etc.)
