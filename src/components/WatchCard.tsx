@@ -239,7 +239,7 @@ export const WatchCard = memo(function WatchCard({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="min-w-[80px]">
-                {HISTORY_FILTER_HOURS_OPTIONS.map((option) => (
+                {HISTORY_FILTER_HOURS_OPTIONS.filter(Boolean).map((option) => (
                   <DropdownMenuItem
                     key={option.value}
                     onClick={() => onHistoryFilterChange(option.value)}
