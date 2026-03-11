@@ -15,8 +15,8 @@
 // Time-based filter options (filter by time window, using H for hours or M for minutes)
 export const HISTORY_FILTER_HOURS_OPTIONS = [
   { value: "1H", label: "1H" },
-  { value: "90M", label: "90M" },
-  { value: "2H", label: "2H" },
+  { value: "3H", label: "3H" },
+  { value: "6H", label: "6H" },
   { value: "12H", label: "12H" },
   { value: "24H", label: "24H" },
   { value: "48H", label: "48H" },
