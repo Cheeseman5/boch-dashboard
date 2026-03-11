@@ -297,6 +297,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     if (zoomedRecords.length === 0) return allChartData;
     return buildBuckets(zoomedRecords);
   })();
+  chartDataRef.current = chartData;
 
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
