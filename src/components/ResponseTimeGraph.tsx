@@ -301,16 +301,16 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     return buildBuckets(zoomedRecords);
   })();
   chartDataRef.current = chartData;
+  const isZoomed = zoomRange !== null;
+  const onVisibleDataChangeRef = useRef(onVisibleDataChange);
+  onVisibleDataChangeRef.current = onVisibleDataChange;
   
-  // Notify parent of visible data on each render when zoomed
-  if (onVisibleDataChange) {
-    const newData = zoomRange ? chartData : null;
-    if (newData !== prevVisibleDataRef.current) {
-      prevVisibleDataRef.current = newData;
-      // Use microtask to avoid setState-during-render
-      queueMicrotask(() => onVisibleDataChange(newData));
+  // Notify parent of visible data changes via effect (not during render)
+  useEffect(() => {
+    if (onVisibleDataChangeRef.current) {
+      onVisibleDataChangeRef.current(isZoomed ? chartDataRef.current : null);
     }
-  }
+  }, [isZoomed, zoomRange]);
 
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
