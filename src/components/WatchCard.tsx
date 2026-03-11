@@ -78,7 +78,7 @@ export const WatchCard = memo(function WatchCard({
       });
     }
   };
-  const filterLabel = HISTORY_FILTER_OPTIONS.find(o => o !== null && o.value === historyFilter)?.label ?? 'All';
+  const filterLabel = HISTORY_FILTER_OPTIONS.find(o => o?.value === historyFilter)?.label ?? 'All';
 
   // Filter history client-side based on the selected filter
   const filteredHistory = (() => {
