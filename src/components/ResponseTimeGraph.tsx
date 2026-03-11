@@ -535,7 +535,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                   stroke="hsl(var(--border))"
                   strokeWidth={2}
                   strokeOpacity={1}
-                  strokeDasharray={b.isDay ? '4 2' : '2 3'}
+                  strokeDasharray={b.isDay ? '1' : '2 3'}
                 />
               ))}
               <Area
