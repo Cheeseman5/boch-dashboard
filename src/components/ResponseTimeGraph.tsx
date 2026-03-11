@@ -364,7 +364,16 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   };
 
   return (
-    <div className="h-full w-full min-h-[100px] flex flex-col overflow-visible">
+    <div className="h-full w-full min-h-[100px] flex flex-col overflow-visible relative">
+      {/* Reset zoom button */}
+      {zoomRange && (
+        <button
+          onClick={handleResetZoom}
+          className="absolute top-0 right-0 z-10 text-[9px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground hover:bg-accent/80 transition-colors border border-border"
+        >
+          Reset zoom
+        </button>
+      )}
       <div className="flex-1 min-h-0 flex">
         {/* Y-axis labels on left */}
         <div className="flex flex-col justify-between items-end pr-1 py-1 shrink-0">
@@ -379,12 +388,23 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
             <AreaChart 
               data={chartData} 
               margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={() => {
+                if (isSelecting) {
+                  setIsSelecting(false);
+                  setZoomLeft(null);
+                  setZoomRight(null);
+                }
+              }}
               onClick={(e) => {
-                if (e?.activePayload?.[0]?.payload && onDataPointClick) {
+                // Only fire click if not zooming
+                if (!zoomLeft && !zoomRight && e?.activePayload?.[0]?.payload && onDataPointClick) {
                   onDataPointClick(e.activePayload[0].payload as BucketData);
                 }
               }}
-              style={{ cursor: onDataPointClick ? 'pointer' : 'default' }}
+              style={{ cursor: isSelecting ? 'col-resize' : 'crosshair' }}
             >
               <defs>
                 <linearGradient id={`strokeGradient-${chartId}`} x1="0" y1="0" x2="0" y2="1">
