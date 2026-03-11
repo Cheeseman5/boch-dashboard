@@ -58,6 +58,8 @@ interface ResponseTimeGraphProps {
   highlightStatusCode?: number | null;
   /** Callback when a data point is clicked */
   onDataPointClick?: (data: BucketData) => void;
+  /** Callback when the visible data changes (e.g. due to zoom) */
+  onVisibleDataChange?: (data: BucketData[] | null) => void;
 }
 
 export interface BucketData {
@@ -155,7 +157,7 @@ const CustomTooltip = React.forwardRef<HTMLDivElement, { active?: boolean; paylo
 );
 CustomTooltip.displayName = 'CustomTooltip';
 
-export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onDataPointClick }: ResponseTimeGraphProps) {
+export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onDataPointClick, onVisibleDataChange }: ResponseTimeGraphProps) {
   // Generate unique ID for this chart instance to avoid gradient conflicts
   const chartId = React.useId().replace(/:/g, '');
   
@@ -166,6 +168,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   const [zoomRange, setZoomRange] = useState<[number, number] | null>(null);
   const didDragRef = React.useRef(false);
   const chartDataRef = React.useRef<BucketData[]>([]);
+  const prevVisibleDataRef = React.useRef<BucketData[] | null | undefined>(undefined);
 
   const handleMouseDown = useCallback((e: any) => {
     if (e?.activeLabel != null) {
@@ -298,6 +301,16 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     return buildBuckets(zoomedRecords);
   })();
   chartDataRef.current = chartData;
+  
+  // Notify parent of visible data on each render when zoomed
+  if (onVisibleDataChange) {
+    const newData = zoomRange ? chartData : null;
+    if (newData !== prevVisibleDataRef.current) {
+      prevVisibleDataRef.current = newData;
+      // Use microtask to avoid setState-during-render
+      queueMicrotask(() => onVisibleDataChange(newData));
+    }
+  }
 
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);

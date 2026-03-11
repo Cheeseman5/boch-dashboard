@@ -1,4 +1,4 @@
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
 import { Pencil, GripHorizontal, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +52,12 @@ export const WatchCard = memo(function WatchCard({
   
   // Track which status code is being hovered in the status list
   const [hoveredStatusCode, setHoveredStatusCode] = useState<number | null>(null);
+  // Track zoomed visible data from the graph
+  const [zoomedData, setZoomedData] = useState<BucketData[] | null>(null);
+
+  const handleVisibleDataChange = useCallback((data: BucketData[] | null) => {
+    setZoomedData(data);
+  }, []);
 
   // Handle click on graph data point - copy to clipboard
   const handleDataPointClick = async (data: BucketData) => {
@@ -175,6 +181,17 @@ export const WatchCard = memo(function WatchCard({
     if (ms === undefined || ms === null) return { value: '-', unit: '' };
     return { value: Math.round(ms).toLocaleString(), unit: 'ms' };
   };
+
+  // Compute the status code summary to display - use zoomed data if available
+  const displayStatusSummary: Record<number, number> = zoomedData
+    ? zoomedData.reduce((acc, bucket) => {
+        Object.entries(bucket.statusSummary).forEach(([code, count]) => {
+          const c = parseInt(code);
+          acc[c] = (acc[c] || 0) + count;
+        });
+        return acc;
+      }, {} as Record<number, number>)
+    : (filteredSummary?.statusSummary ?? {});
 
   return (
     <Card 
@@ -319,6 +336,7 @@ export const WatchCard = memo(function WatchCard({
               isLoading={isLoading}
               highlightStatusCode={hoveredStatusCode}
               onDataPointClick={handleDataPointClick}
+              onVisibleDataChange={handleVisibleDataChange}
             />
           </div>
 
@@ -328,8 +346,8 @@ export const WatchCard = memo(function WatchCard({
             <div className="flex-1 overflow-y-auto max-h-[88px]">
               {isLoading ? (
                 <span className="skeleton-pulse inline-block w-full h-3" />
-              ) : filteredSummary?.statusSummary && Object.keys(filteredSummary.statusSummary).length > 0 ? (
-                Object.entries(filteredSummary.statusSummary)
+              ) : Object.keys(displayStatusSummary).length > 0 ? (
+                Object.entries(displayStatusSummary)
                   .sort(([a], [b]) => parseInt(a) - parseInt(b))
                   .map(([code, count]) => {
                     const numCode = parseInt(code, 10);
