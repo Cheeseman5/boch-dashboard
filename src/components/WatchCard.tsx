@@ -182,6 +182,17 @@ export const WatchCard = memo(function WatchCard({
     return { value: Math.round(ms).toLocaleString(), unit: 'ms' };
   };
 
+  // Compute the status code summary to display - use zoomed data if available
+  const displayStatusSummary: Record<number, number> = zoomedData
+    ? zoomedData.reduce((acc, bucket) => {
+        Object.entries(bucket.statusSummary).forEach(([code, count]) => {
+          const c = parseInt(code);
+          acc[c] = (acc[c] || 0) + count;
+        });
+        return acc;
+      }, {} as Record<number, number>)
+    : (filteredSummary?.statusSummary ?? {});
+
   return (
     <Card 
       className={cn(
