@@ -52,6 +52,12 @@ export const WatchCard = memo(function WatchCard({
   
   // Track which status code is being hovered in the status list
   const [hoveredStatusCode, setHoveredStatusCode] = useState<number | null>(null);
+  // Track zoomed visible data from the graph
+  const [zoomedData, setZoomedData] = useState<BucketData[] | null>(null);
+
+  const handleVisibleDataChange = useCallback((data: BucketData[] | null) => {
+    setZoomedData(data);
+  }, []);
 
   // Handle click on graph data point - copy to clipboard
   const handleDataPointClick = async (data: BucketData) => {
