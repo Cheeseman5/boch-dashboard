@@ -58,6 +58,8 @@ interface ResponseTimeGraphProps {
   highlightStatusCode?: number | null;
   /** Callback when a data point is clicked */
   onDataPointClick?: (data: BucketData) => void;
+  /** Callback when the visible data changes (e.g. due to zoom) */
+  onVisibleDataChange?: (data: BucketData[] | null) => void;
 }
 
 export interface BucketData {
