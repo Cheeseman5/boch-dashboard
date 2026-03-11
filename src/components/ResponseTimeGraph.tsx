@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   AreaChart,
   Area,
@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
+  ReferenceArea,
 } from 'recharts';
 import type { History, StoplightStatus } from '@/types/api';
 import { format } from 'date-fns';
@@ -158,8 +159,42 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   // Generate unique ID for this chart instance to avoid gradient conflicts
   const chartId = React.useId().replace(/:/g, '');
   
+  // Zoom state
+  const [zoomLeft, setZoomLeft] = useState<number | null>(null);
+  const [zoomRight, setZoomRight] = useState<number | null>(null);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [zoomRange, setZoomRange] = useState<[number, number] | null>(null);
+
+  const handleMouseDown = useCallback((e: any) => {
+    if (e?.activeLabel != null) {
+      setZoomLeft(e.activeLabel);
+      setZoomRight(null);
+      setIsSelecting(true);
+    }
+  }, []);
+
+  const handleMouseMove = useCallback((e: any) => {
+    if (isSelecting && e?.activeLabel != null) {
+      setZoomRight(e.activeLabel);
+    }
+  }, [isSelecting]);
+
+  const handleMouseUp = useCallback(() => {
+    if (isSelecting && zoomLeft != null && zoomRight != null && zoomLeft !== zoomRight) {
+      const left = Math.min(zoomLeft, zoomRight);
+      const right = Math.max(zoomLeft, zoomRight);
+      setZoomRange([left, right]);
+    }
+    setZoomLeft(null);
+    setZoomRight(null);
+    setIsSelecting(false);
+  }, [isSelecting, zoomLeft, zoomRight]);
+
+  const handleResetZoom = useCallback(() => {
+    setZoomRange(null);
+  }, []);
+
   // Defer rendering to avoid "Layout was forced before the page was fully loaded" warning
-  // Wait for document to be fully loaded AND use double-rAF for safety
   const [isReady, setIsReady] = React.useState(false);
   React.useEffect(() => {
     let rafId1: number;
@@ -168,7 +203,6 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
 
     const activate = () => {
       if (cancelled) return;
-      // Double requestAnimationFrame ensures we wait until after the browser has truly painted
       rafId1 = requestAnimationFrame(() => {
         rafId2 = requestAnimationFrame(() => {
           if (!cancelled) setIsReady(true);
@@ -213,7 +247,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   const maxBuckets = 90;
   const bucketSize = Math.ceil(sortedHistory.length / maxBuckets);
   
-  const chartData: BucketData[] = [];
+  const allChartData: BucketData[] = [];
   for (let i = 0; i < sortedHistory.length; i += bucketSize) {
     const bucket = sortedHistory.slice(i, i + bucketSize);
     if (bucket.length === 0) continue;
@@ -229,7 +263,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     const startMs = new Date(bucket[0].dateTime).getTime();
     const endMs = new Date(bucket[bucket.length - 1].dateTime).getTime();
     
-    chartData.push({
+    allChartData.push({
       startDateTime: bucket[0].dateTime,
       endDateTime: bucket[bucket.length - 1].dateTime,
       timestamp: Math.round((startMs + endMs) / 2),
@@ -240,6 +274,11 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
       records: bucket,
     });
   }
+
+  // Apply zoom filter
+  const chartData = zoomRange
+    ? allChartData.filter(d => d.timestamp >= zoomRange[0] && d.timestamp <= zoomRange[1])
+    : allChartData;
 
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
@@ -325,7 +364,16 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   };
 
   return (
-    <div className="h-full w-full min-h-[100px] flex flex-col overflow-visible">
+    <div className="h-full w-full min-h-[100px] flex flex-col overflow-visible relative">
+      {/* Reset zoom button */}
+      {zoomRange && (
+        <button
+          onClick={handleResetZoom}
+          className="absolute top-0 right-0 z-10 text-[9px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground hover:bg-accent/80 transition-colors border border-border"
+        >
+          Reset zoom
+        </button>
+      )}
       <div className="flex-1 min-h-0 flex">
         {/* Y-axis labels on left */}
         <div className="flex flex-col justify-between items-end pr-1 py-1 shrink-0">
@@ -340,12 +388,23 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
             <AreaChart 
               data={chartData} 
               margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={() => {
+                if (isSelecting) {
+                  setIsSelecting(false);
+                  setZoomLeft(null);
+                  setZoomRight(null);
+                }
+              }}
               onClick={(e) => {
-                if (e?.activePayload?.[0]?.payload && onDataPointClick) {
+                // Only fire click if not zooming
+                if (!zoomLeft && !zoomRight && e?.activePayload?.[0]?.payload && onDataPointClick) {
                   onDataPointClick(e.activePayload[0].payload as BucketData);
                 }
               }}
-              style={{ cursor: onDataPointClick ? 'pointer' : 'default' }}
+              style={{ cursor: isSelecting ? 'col-resize' : 'crosshair' }}
             >
               <defs>
                 <linearGradient id={`strokeGradient-${chartId}`} x1="0" y1="0" x2="0" y2="1">
@@ -476,6 +535,17 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                   );
                 }}
               />
+              {/* Drag selection overlay */}
+              {isSelecting && zoomLeft != null && zoomRight != null && (
+                <ReferenceArea
+                  x1={Math.min(zoomLeft, zoomRight)}
+                  x2={Math.max(zoomLeft, zoomRight)}
+                  strokeOpacity={0.3}
+                  fill="hsl(var(--primary))"
+                  fillOpacity={0.15}
+                  stroke="hsl(var(--primary))"
+                />
+              )}
             </AreaChart>
           </ResponsiveContainer>
         </div>
