@@ -630,7 +630,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
           return (
             <span
               key={b.timestamp}
-              className="absolute text-[8px] text-muted-foreground/60 -translate-x-1/2 whitespace-nowrap"
+              className="absolute text-[8px] text-muted-foreground -translate-x-1/2 whitespace-nowrap"
               style={{ left: `calc(2rem + ${pct * 0.01} * (100% - 2rem))`, transform: 'translateX(-50%)' }}
             >
               {b.label}
