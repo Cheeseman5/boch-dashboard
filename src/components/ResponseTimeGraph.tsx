@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   AreaChart,
   Area,
@@ -168,7 +168,16 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   const [zoomRange, setZoomRange] = useState<[number, number] | null>(null);
   const didDragRef = React.useRef(false);
   const chartDataRef = React.useRef<BucketData[]>([]);
-  const prevVisibleDataRef = React.useRef<BucketData[] | null | undefined>(undefined);
+  const onVisibleDataChangeRef = useRef(onVisibleDataChange);
+  onVisibleDataChangeRef.current = onVisibleDataChange;
+
+  // Notify parent of visible data changes via effect (not during render)
+  const isZoomed = zoomRange !== null;
+  useEffect(() => {
+    if (onVisibleDataChangeRef.current) {
+      onVisibleDataChangeRef.current(isZoomed ? chartDataRef.current : null);
+    }
+  }, [isZoomed, zoomRange]);
 
   const handleMouseDown = useCallback((e: any) => {
     if (e?.activeLabel != null) {
@@ -301,16 +310,6 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     return buildBuckets(zoomedRecords);
   })();
   chartDataRef.current = chartData;
-  
-  // Notify parent of visible data on each render when zoomed
-  if (onVisibleDataChange) {
-    const newData = zoomRange ? chartData : null;
-    if (newData !== prevVisibleDataRef.current) {
-      prevVisibleDataRef.current = newData;
-      // Use microtask to avoid setState-during-render
-      queueMicrotask(() => onVisibleDataChange(newData));
-    }
-  }
 
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
