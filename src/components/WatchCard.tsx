@@ -346,28 +346,8 @@ export const WatchCard = memo(function WatchCard({
             <div className="flex-1 overflow-y-auto max-h-[88px]">
               {isLoading ? (
                 <span className="skeleton-pulse inline-block w-full h-3" />
-              ) : (() => {
-                // Use zoomed data's status summary if available, otherwise use filtered summary
-                const displaySummary = zoomedData
-                  ? zoomedData.reduce((acc, bucket) => {
-                      Object.entries(bucket.statusSummary).forEach(([code, count]) => {
-                        acc[parseInt(code)] = (acc[parseInt(code)] || 0) + count;
-                      });
-                      return acc;
-                    }, {} as Record<number, number>)
-                  : filteredSummary?.statusSummary;
-                return displaySummary && Object.keys(displaySummary).length > 0;
-              })() ? (
-                (() => {
-                  const displaySummary = zoomedData
-                    ? zoomedData.reduce((acc, bucket) => {
-                        Object.entries(bucket.statusSummary).forEach(([code, count]) => {
-                          acc[parseInt(code)] = (acc[parseInt(code)] || 0) + count;
-                        });
-                        return acc;
-                      }, {} as Record<number, number>)
-                    : filteredSummary?.statusSummary ?? {};
-                  return Object.entries(displaySummary)
+              ) : Object.keys(displayStatusSummary).length > 0 ? (
+                Object.entries(displayStatusSummary)
                   .sort(([a], [b]) => parseInt(a) - parseInt(b))
                   .map(([code, count]) => {
                     const numCode = parseInt(code, 10);
