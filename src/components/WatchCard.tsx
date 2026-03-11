@@ -381,7 +381,7 @@ export const WatchCard = memo(function WatchCard({
                     })}
                   {Object.keys(displayStatusSummary).length > 1 && (
                     <div className="flex justify-between items-center gap-1 text-xs font-mono leading-tight px-0.5 border-t border-border mt-0.5 pt-0.5">
-                      <span className="text-muted-foreground">Total</span>
+                      <span className="text-muted-foreground">TTL</span>
                       <span className="text-muted-foreground">×{Object.values(displayStatusSummary).reduce((sum, c) => sum + c, 0)}</span>
                     </div>
                   )}
