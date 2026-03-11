@@ -414,8 +414,8 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                 }
               }}
               onClick={(e) => {
-                // Only fire click if not zooming
-                if (!zoomLeft && !zoomRight && e?.activePayload?.[0]?.payload && onDataPointClick) {
+                // Only fire click if not dragging to zoom
+                if (!didDragRef.current && e?.activePayload?.[0]?.payload && onDataPointClick) {
                   onDataPointClick(e.activePayload[0].payload as BucketData);
                 }
               }}
