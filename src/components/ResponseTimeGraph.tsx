@@ -243,42 +243,54 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
   );
   
-  // Group into max 90 buckets
-  const maxBuckets = 90;
-  const bucketSize = Math.ceil(sortedHistory.length / maxBuckets);
-  
-  const allChartData: BucketData[] = [];
-  for (let i = 0; i < sortedHistory.length; i += bucketSize) {
-    const bucket = sortedHistory.slice(i, i + bucketSize);
-    if (bucket.length === 0) continue;
-    
-    const responseTimes = bucket.map((h) => h.responseTimeMs);
-    const statusSummary = bucket.reduce((acc, h) => {
-      acc[h.statusCode] = (acc[h.statusCode] || 0) + 1;
-      return acc;
-    }, {} as Record<number, number>);
+  // Bucket a set of sorted history records into up to maxBuckets
+  const buildBuckets = (records: typeof sortedHistory): BucketData[] => {
+    const maxBuckets = 90;
+    const bSize = Math.ceil(records.length / maxBuckets);
+    const result: BucketData[] = [];
+    for (let i = 0; i < records.length; i += bSize) {
+      const bucket = records.slice(i, i + bSize);
+      if (bucket.length === 0) continue;
+      const rts = bucket.map((h) => h.responseTimeMs);
+      const statusSummary = bucket.reduce((acc, h) => {
+        acc[h.statusCode] = (acc[h.statusCode] || 0) + 1;
+        return acc;
+      }, {} as Record<number, number>);
+      const hasErrors = bucket.some((h) => h.statusCode >= 400 || h.statusCode === 0);
+      const startMs = new Date(bucket[0].dateTime).getTime();
+      const endMs = new Date(bucket[bucket.length - 1].dateTime).getTime();
+      result.push({
+        startDateTime: bucket[0].dateTime,
+        endDateTime: bucket[bucket.length - 1].dateTime,
+        timestamp: Math.round((startMs + endMs) / 2),
+        responseTimeMs: aggregateResponseTimes(rts),
+        count: bucket.length,
+        statusSummary,
+        hasErrors,
+        records: bucket,
+      });
+    }
+    return result;
+  };
 
-    const hasErrors = bucket.some((h) => h.statusCode >= 400 || h.statusCode === 0);
-    
-    const startMs = new Date(bucket[0].dateTime).getTime();
-    const endMs = new Date(bucket[bucket.length - 1].dateTime).getTime();
-    
-    allChartData.push({
-      startDateTime: bucket[0].dateTime,
-      endDateTime: bucket[bucket.length - 1].dateTime,
-      timestamp: Math.round((startMs + endMs) / 2),
-      responseTimeMs: aggregateResponseTimes(responseTimes),
-      count: bucket.length,
-      statusSummary,
-      hasErrors,
-      records: bucket,
+  const allChartData = buildBuckets(sortedHistory);
+
+  // When zoomed, re-bucket from raw history within the zoom range for max resolution
+  const chartData = (() => {
+    if (!zoomRange) return allChartData;
+    // Find the boundary buckets to get the full time span covered by selected buckets
+    const selectedBuckets = allChartData.filter(d => d.timestamp >= zoomRange[0] && d.timestamp <= zoomRange[1]);
+    if (selectedBuckets.length === 0) return allChartData;
+    const rangeStart = new Date(selectedBuckets[0].startDateTime).getTime();
+    const rangeEnd = new Date(selectedBuckets[selectedBuckets.length - 1].endDateTime).getTime();
+    // Get all raw records within this time span
+    const zoomedRecords = sortedHistory.filter(h => {
+      const t = new Date(h.dateTime).getTime();
+      return t >= rangeStart && t <= rangeEnd;
     });
-  }
-
-  // Apply zoom filter
-  const chartData = zoomRange
-    ? allChartData.filter(d => d.timestamp >= zoomRange[0] && d.timestamp <= zoomRange[1])
-    : allChartData;
+    if (zoomedRecords.length === 0) return selectedBuckets;
+    return buildBuckets(zoomedRecords);
+  })();
 
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
