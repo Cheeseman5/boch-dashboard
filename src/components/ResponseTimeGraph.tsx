@@ -164,18 +164,21 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   const [zoomRight, setZoomRight] = useState<number | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [zoomRange, setZoomRange] = useState<[number, number] | null>(null);
+  const didDragRef = React.useRef(false);
 
   const handleMouseDown = useCallback((e: any) => {
     if (e?.activeLabel != null) {
       setZoomLeft(e.activeLabel);
       setZoomRight(null);
       setIsSelecting(true);
+      didDragRef.current = false;
     }
   }, []);
 
   const handleMouseMove = useCallback((e: any) => {
     if (isSelecting && e?.activeLabel != null) {
       setZoomRight(e.activeLabel);
+      didDragRef.current = true;
     }
   }, [isSelecting]);
 
