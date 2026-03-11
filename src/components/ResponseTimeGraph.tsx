@@ -159,8 +159,42 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   // Generate unique ID for this chart instance to avoid gradient conflicts
   const chartId = React.useId().replace(/:/g, '');
   
+  // Zoom state
+  const [zoomLeft, setZoomLeft] = useState<number | null>(null);
+  const [zoomRight, setZoomRight] = useState<number | null>(null);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [zoomRange, setZoomRange] = useState<[number, number] | null>(null);
+
+  const handleMouseDown = useCallback((e: any) => {
+    if (e?.activeLabel != null) {
+      setZoomLeft(e.activeLabel);
+      setZoomRight(null);
+      setIsSelecting(true);
+    }
+  }, []);
+
+  const handleMouseMove = useCallback((e: any) => {
+    if (isSelecting && e?.activeLabel != null) {
+      setZoomRight(e.activeLabel);
+    }
+  }, [isSelecting]);
+
+  const handleMouseUp = useCallback(() => {
+    if (isSelecting && zoomLeft != null && zoomRight != null && zoomLeft !== zoomRight) {
+      const left = Math.min(zoomLeft, zoomRight);
+      const right = Math.max(zoomLeft, zoomRight);
+      setZoomRange([left, right]);
+    }
+    setZoomLeft(null);
+    setZoomRight(null);
+    setIsSelecting(false);
+  }, [isSelecting, zoomLeft, zoomRight]);
+
+  const handleResetZoom = useCallback(() => {
+    setZoomRange(null);
+  }, []);
+
   // Defer rendering to avoid "Layout was forced before the page was fully loaded" warning
-  // Wait for document to be fully loaded AND use double-rAF for safety
   const [isReady, setIsReady] = React.useState(false);
   React.useEffect(() => {
     let rafId1: number;
@@ -169,7 +203,6 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
 
     const activate = () => {
       if (cancelled) return;
-      // Double requestAnimationFrame ensures we wait until after the browser has truly painted
       rafId1 = requestAnimationFrame(() => {
         rafId2 = requestAnimationFrame(() => {
           if (!cancelled) setIsReady(true);
@@ -214,7 +247,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   const maxBuckets = 90;
   const bucketSize = Math.ceil(sortedHistory.length / maxBuckets);
   
-  const chartData: BucketData[] = [];
+  const allChartData: BucketData[] = [];
   for (let i = 0; i < sortedHistory.length; i += bucketSize) {
     const bucket = sortedHistory.slice(i, i + bucketSize);
     if (bucket.length === 0) continue;
@@ -230,7 +263,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     const startMs = new Date(bucket[0].dateTime).getTime();
     const endMs = new Date(bucket[bucket.length - 1].dateTime).getTime();
     
-    chartData.push({
+    allChartData.push({
       startDateTime: bucket[0].dateTime,
       endDateTime: bucket[bucket.length - 1].dateTime,
       timestamp: Math.round((startMs + endMs) / 2),
@@ -241,6 +274,11 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
       records: bucket,
     });
   }
+
+  // Apply zoom filter
+  const chartData = zoomRange
+    ? allChartData.filter(d => d.timestamp >= zoomRange[0] && d.timestamp <= zoomRange[1])
+    : allChartData;
 
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
