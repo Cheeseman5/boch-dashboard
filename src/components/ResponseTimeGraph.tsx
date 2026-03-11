@@ -186,7 +186,13 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     if (isSelecting && zoomLeft != null && zoomRight != null && zoomLeft !== zoomRight) {
       const left = Math.min(zoomLeft, zoomRight);
       const right = Math.max(zoomLeft, zoomRight);
-      setZoomRange([left, right]);
+      // Find the actual time boundaries from the currently displayed chart data
+      const selectedPoints = chartDataRef.current.filter(d => d.timestamp >= left && d.timestamp <= right);
+      if (selectedPoints.length > 0) {
+        const rangeStart = new Date(selectedPoints[0].startDateTime).getTime();
+        const rangeEnd = new Date(selectedPoints[selectedPoints.length - 1].endDateTime).getTime();
+        setZoomRange([rangeStart, rangeEnd]);
+      }
     }
     setZoomLeft(null);
     setZoomRight(null);
