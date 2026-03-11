@@ -23,6 +23,7 @@ export const HISTORY_FILTER_HOURS_OPTIONS = [
   { value: "72H", label: "3D" },
   { value: "96H", label: "4D" },
   { value: "120H", label: "5D" },
+  { value: "144H", label: "6D" },
 ] as const;
 
 // Record-count-based filter options (filter by last N records)
