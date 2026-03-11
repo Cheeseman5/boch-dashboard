@@ -445,9 +445,14 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                   ))}
                 </linearGradient>
                 <linearGradient id={`fillGradient-${chartId}`} x1="0" y1="0" x2="0" y2="1">
-                  {gradientStops.map((stop, i) => (
-                    <stop key={i} offset={stop.offset} stopColor={stop.color} stopOpacity={i === 0 ? 0.3 : 0} />
-                  ))}
+                  {gradientStops.map((stop, i) => {
+                    // Linearly interpolate opacity from 0.3 at top (0%) to 0 at bottom (100%)
+                    const offsetNum = parseFloat(stop.offset) / 100;
+                    const opacity = 0.3 * (1 - offsetNum);
+                    return (
+                      <stop key={i} offset={stop.offset} stopColor={stop.color} stopOpacity={opacity} />
+                    );
+                  })}
                 </linearGradient>
               </defs>
               <XAxis 
