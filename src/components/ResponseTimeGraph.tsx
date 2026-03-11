@@ -301,6 +301,11 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   })();
   chartDataRef.current = chartData;
 
+  // Notify parent when visible data changes due to zoom
+  React.useEffect(() => {
+    onVisibleDataChange?.(zoomRange ? chartData : null);
+  }, [zoomRange, chartData, onVisibleDataChange]);
+
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
   const minResponse = Math.min(...responseTimes);
