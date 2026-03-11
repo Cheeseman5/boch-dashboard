@@ -83,33 +83,60 @@ const TARGET_LABELS = 10;
  */
 function getTimeBoundaries(startMs: number, endMs: number) {
   const boundaries: { timestamp: number; label: string; isDay: boolean }[] = [];
-  const spanHours = (endMs - startMs) / (60 * 60 * 1000);
   
   // Pick the smallest clean interval (in minutes) that yields ≤ TARGET_LABELS
   const spanMinutes = (endMs - startMs) / (60 * 1000);
   const idealInterval = spanMinutes / TARGET_LABELS;
   const minuteInterval = MINUTE_INTERVALS.find(i => i >= idealInterval) ?? 1440;
   
-  // Find first aligned boundary after start
+  // Find first aligned boundary after start using calendar-safe arithmetic
   const first = new Date(startMs);
   first.setSeconds(0, 0);
-  // Align to next interval boundary
   const currentMinutes = first.getHours() * 60 + first.getMinutes();
   const nextAligned = Math.ceil((currentMinutes + 1) / minuteInterval) * minuteInterval;
-  first.setHours(0, 0, 0, 0);
-  const startAligned = first.getTime() + nextAligned * 60 * 1000;
   
-  for (let t = startAligned; t < endMs; t += minuteInterval * 60 * 1000) {
-    const d = new Date(t);
-    const hour = d.getHours();
-    const minute = d.getMinutes();
-    const isDay = hour === 0 && minute === 0;
+  // Start from midnight of the start day, then add the aligned offset via setMinutes
+  // to stay DST-safe
+  const base = new Date(first);
+  base.setHours(0, 0, 0, 0);
+  
+  // Iterate using calendar-based stepping to avoid DST drift
+  const startDay = new Date(base);
+  let offsetMinutes = nextAligned;
+  
+  // Walk forward in calendar-aligned steps
+  while (true) {
+    const d = new Date(startDay);
+    // Use setHours/setMinutes to let the engine handle DST
+    const hours = Math.floor(offsetMinutes / 60);
+    const mins = offsetMinutes % 60;
     
-    boundaries.push({
-      timestamp: t,
-      label: isDay ? format(d, 'MMM d') : format(d, 'HH:mm'),
-      isDay,
-    });
+    if (hours >= 24) {
+      // Advance by full days using setDate to handle DST correctly
+      const daysToAdd = Math.floor(hours / 24);
+      const remainingHours = hours % 24;
+      d.setDate(d.getDate() + daysToAdd);
+      d.setHours(remainingHours, mins, 0, 0);
+    } else {
+      d.setHours(hours, mins, 0, 0);
+    }
+    
+    const t = d.getTime();
+    if (t >= endMs) break;
+    
+    if (t > startMs) {
+      const hour = d.getHours();
+      const minute = d.getMinutes();
+      const isDay = hour === 0 && minute === 0;
+      
+      boundaries.push({
+        timestamp: t,
+        label: isDay ? format(d, 'MMM d') : format(d, 'HH:mm'),
+        isDay,
+      });
+    }
+    
+    offsetMinutes += minuteInterval;
   }
   
   return boundaries;
