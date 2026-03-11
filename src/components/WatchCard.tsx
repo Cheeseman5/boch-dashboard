@@ -354,37 +354,38 @@ export const WatchCard = memo(function WatchCard({
               {isLoading ? (
                 <span className="skeleton-pulse inline-block w-full h-3" />
               ) : Object.keys(displayStatusSummary).length > 0 ? (
-                Object.entries(displayStatusSummary)
-                  .sort(([a], [b]) => parseInt(a) - parseInt(b))
-                  .map(([code, count]) => {
-                    const numCode = parseInt(code, 10);
-                    return (
-                      <div 
-                        key={code} 
-                        className={cn(
-                          "flex justify-between items-center gap-1 text-xs font-mono leading-tight cursor-pointer rounded px-0.5 transition-colors",
-                          hoveredStatusCode === numCode && "bg-accent ring-1 ring-border"
-                        )}
-                        onMouseEnter={() => setHoveredStatusCode(numCode)}
-                        onMouseLeave={() => setHoveredStatusCode(null)}
-                      >
-                        <span 
-                          style={{ color: getStatusCodeHslColor(numCode) }}
-                          className={cn(hoveredStatusCode === numCode && "font-bold brightness-125 drop-shadow-[0_0_4px_currentColor]")}
+                <>
+                  {Object.entries(displayStatusSummary)
+                    .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                    .map(([code, count]) => {
+                      const numCode = parseInt(code, 10);
+                      return (
+                        <div 
+                          key={code} 
+                          className={cn(
+                            "flex justify-between items-center gap-1 text-xs font-mono leading-tight cursor-pointer rounded px-0.5 transition-colors",
+                            hoveredStatusCode === numCode && "bg-accent ring-1 ring-border"
+                          )}
+                          onMouseEnter={() => setHoveredStatusCode(numCode)}
+                          onMouseLeave={() => setHoveredStatusCode(null)}
                         >
-                          {code}
-                        </span>
-                        <span className={cn("text-muted-foreground", hoveredStatusCode === numCode && "text-foreground")}>×{count}</span>
-                      </div>
-                    );
-                  })
-                }
-                {Object.keys(displayStatusSummary).length > 1 && (
-                  <div className="flex justify-between items-center gap-1 text-xs font-mono leading-tight px-0.5 border-t border-border mt-0.5 pt-0.5">
-                    <span className="text-muted-foreground">Total</span>
-                    <span className="text-muted-foreground">×{Object.values(displayStatusSummary).reduce((sum, c) => sum + c, 0)}</span>
-                  </div>
-                )
+                          <span 
+                            style={{ color: getStatusCodeHslColor(numCode) }}
+                            className={cn(hoveredStatusCode === numCode && "font-bold brightness-125 drop-shadow-[0_0_4px_currentColor]")}
+                          >
+                            {code}
+                          </span>
+                          <span className={cn("text-muted-foreground", hoveredStatusCode === numCode && "text-foreground")}>×{count}</span>
+                        </div>
+                      );
+                    })}
+                  {Object.keys(displayStatusSummary).length > 1 && (
+                    <div className="flex justify-between items-center gap-1 text-xs font-mono leading-tight px-0.5 border-t border-border mt-0.5 pt-0.5">
+                      <span className="text-muted-foreground">Total</span>
+                      <span className="text-muted-foreground">×{Object.values(displayStatusSummary).reduce((sum, c) => sum + c, 0)}</span>
+                    </div>
+                  )}
+                </>
               ) : (
                 <span className="text-xs text-muted-foreground">—</span>
               )}
