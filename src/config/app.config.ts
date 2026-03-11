@@ -34,9 +34,9 @@ export const HISTORY_FILTER_COUNT_OPTIONS = [
 
 // Combined options (used for label lookups, etc.)
 export const HISTORY_FILTER_OPTIONS = [
+  { value: "all" as const, label: "All" },
   ...HISTORY_FILTER_HOURS_OPTIONS,
   ...HISTORY_FILTER_COUNT_OPTIONS,
-  { value: "all" as const, label: "All" },
 ] as const;
 
 // Type for time-based filters like "1H", "90M", etc.
