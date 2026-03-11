@@ -300,11 +300,16 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     return buildBuckets(zoomedRecords);
   })();
   chartDataRef.current = chartData;
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- chartData is derived, not a hook dep issue
-  const visibleDataForCallback = zoomRange ? chartData : null;
-  // Use a ref to track previous value and only call when it changes
-  const prevVisibleDataRef = React.useRef<BucketData[] | null | undefined>(undefined);
+  
+  // Notify parent of visible data on each render when zoomed
+  if (onVisibleDataChange) {
+    const newData = zoomRange ? chartData : null;
+    if (newData !== prevVisibleDataRef.current) {
+      prevVisibleDataRef.current = newData;
+      // Use microtask to avoid setState-during-render
+      queueMicrotask(() => onVisibleDataChange(newData));
+    }
+  }
 
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
