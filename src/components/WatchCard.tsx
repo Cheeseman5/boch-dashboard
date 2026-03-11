@@ -325,6 +325,7 @@ export const WatchCard = memo(function WatchCard({
               isLoading={isLoading}
               highlightStatusCode={hoveredStatusCode}
               onDataPointClick={handleDataPointClick}
+              onVisibleDataChange={handleVisibleDataChange}
             />
           </div>
 
