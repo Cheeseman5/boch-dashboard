@@ -252,16 +252,16 @@ export const WatchCard = memo(function WatchCard({
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
-                {HISTORY_FILTER_COUNT_OPTIONS.map((option) => (
+                {HISTORY_FILTER_COUNT_OPTIONS.filter(Boolean).map((option) => (
                   <DropdownMenuItem
-                    key={option.value}
-                    onClick={() => onHistoryFilterChange(option.value)}
+                    key={option!.value}
+                    onClick={() => onHistoryFilterChange(option!.value)}
                     className={cn(
                       'text-xs cursor-pointer',
-                      historyFilter === option.value && 'bg-accent'
+                      historyFilter === option!.value && 'bg-accent'
                     )}
                   >
-                    {option.label}
+                    {option!.label}
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
