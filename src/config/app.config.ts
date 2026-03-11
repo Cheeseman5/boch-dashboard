@@ -32,15 +32,15 @@ export const HISTORY_FILTER_COUNT_OPTIONS = [
   //{ value: 2000, label: "2000" },
 ] as const;
 
-// Combined options (used for label lookups, etc.)
+// Combined options (used for label lookups, etc.) - filters out nulls
 export const HISTORY_FILTER_OPTIONS = [
   { value: "all" as const, label: "All" },
   ...HISTORY_FILTER_HOURS_OPTIONS,
   ...HISTORY_FILTER_COUNT_OPTIONS,
-] as const;
+].filter(Boolean) as { value: string | number; label: string }[];
 
 // Type for time-based filters like "1H", "90M", etc.
-export type HourFilter = (typeof HISTORY_FILTER_HOURS_OPTIONS)[number]["value"];
+export type HourFilter = string;
 
 // Combined filter type
 export type HistoryFilter = number | "all" | HourFilter;
