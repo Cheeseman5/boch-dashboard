@@ -375,7 +375,7 @@ export const WatchCard = memo(function WatchCard({
                           >
                             {code}
                           </span>
-                          <span className={cn("text-muted-foreground", hoveredStatusCode === numCode && "text-foreground")}>×{count}</span>
+                          <span className={cn("text-muted-foreground", hoveredStatusCode === numCode && "text-foreground")}>×{count.toLocaleString()}</span>
                         </div>
                       );
                     })}
