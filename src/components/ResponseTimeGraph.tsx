@@ -165,6 +165,7 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   const [isSelecting, setIsSelecting] = useState(false);
   const [zoomRange, setZoomRange] = useState<[number, number] | null>(null);
   const didDragRef = React.useRef(false);
+  const chartDataRef = React.useRef<BucketData[]>([]);
 
   const handleMouseDown = useCallback((e: any) => {
     if (e?.activeLabel != null) {
