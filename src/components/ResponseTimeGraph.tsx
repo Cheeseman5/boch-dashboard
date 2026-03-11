@@ -535,6 +535,17 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                   );
                 }}
               />
+              {/* Drag selection overlay */}
+              {isSelecting && zoomLeft != null && zoomRight != null && (
+                <ReferenceArea
+                  x1={Math.min(zoomLeft, zoomRight)}
+                  x2={Math.max(zoomLeft, zoomRight)}
+                  strokeOpacity={0.3}
+                  fill="hsl(var(--primary))"
+                  fillOpacity={0.15}
+                  stroke="hsl(var(--primary))"
+                />
+              )}
             </AreaChart>
           </ResponsiveContainer>
         </div>
