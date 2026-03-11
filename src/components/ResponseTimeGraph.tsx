@@ -157,7 +157,7 @@ const CustomTooltip = React.forwardRef<HTMLDivElement, { active?: boolean; paylo
 );
 CustomTooltip.displayName = 'CustomTooltip';
 
-export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onDataPointClick }: ResponseTimeGraphProps) {
+export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onDataPointClick, onVisibleDataChange }: ResponseTimeGraphProps) {
   // Generate unique ID for this chart instance to avoid gradient conflicts
   const chartId = React.useId().replace(/:/g, '');
   
