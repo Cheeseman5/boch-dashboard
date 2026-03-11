@@ -64,7 +64,7 @@ export function parseHourFilter(filter: HourFilter): number {
 }
 
 // Default filter applied to new watches
-export const DEFAULT_HISTORY_FILTER: HistoryFilter = 30;
+export const DEFAULT_HISTORY_FILTER: HistoryFilter = "all";
 
 // ============================================================================
 // STOPLIGHT THRESHOLDS
@@ -110,14 +110,14 @@ export const STOPLIGHT_THRESHOLDS = {
   criticalLatencyMs: 3000,
 
   /** Percentile response time (ms) that triggers YELLOW status */
-  warningLatencyMs: 1000,
+  warningLatencyMs: 1200,
 
   /** How to aggregate response times for each graph bucket */
   graphAggregation: "percentile" as GraphAggregationMethod,
 
   /**
    * Data scope for watch-level STOPLIGHT STATUS (the colored indicator).
-   * - 'total': Status reflects the entire watch history (default behavior)
+   * - 'total': Status reflects the entire watch history
    * - 'filtered': Status reflects only the currently viewed/filtered records
    */
   watchStatusScope: "filtered" as WatchDataScope,
