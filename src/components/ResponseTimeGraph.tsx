@@ -301,10 +301,10 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   })();
   chartDataRef.current = chartData;
 
-  // Notify parent when visible data changes due to zoom
-  React.useEffect(() => {
-    onVisibleDataChange?.(zoomRange ? chartData : null);
-  }, [zoomRange, chartData, onVisibleDataChange]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- chartData is derived, not a hook dep issue
+  const visibleDataForCallback = zoomRange ? chartData : null;
+  // Use a ref to track previous value and only call when it changes
+  const prevVisibleDataRef = React.useRef<BucketData[] | null | undefined>(undefined);
 
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
