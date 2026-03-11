@@ -30,7 +30,6 @@ export const HISTORY_FILTER_HOURS_OPTIONS = [
 export const HISTORY_FILTER_COUNT_OPTIONS = [
   //{ value: 1000, label: "1000" },
   //{ value: 2000, label: "2000" },
-  null,
 ] as const;
 
 // Combined options (used for label lookups, etc.)
