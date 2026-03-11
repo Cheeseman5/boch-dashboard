@@ -278,15 +278,17 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
   // When zoomed, re-bucket from raw history within the zoom range for max resolution
   const chartData = (() => {
     if (!zoomRange) return allChartData;
-    // Find raw records whose timestamps fall within the zoomed bucket range (inclusive)
+    // Find the boundary buckets to get the full time span covered by selected buckets
+    const selectedBuckets = allChartData.filter(d => d.timestamp >= zoomRange[0] && d.timestamp <= zoomRange[1]);
+    if (selectedBuckets.length === 0) return allChartData;
+    const rangeStart = new Date(selectedBuckets[0].startDateTime).getTime();
+    const rangeEnd = new Date(selectedBuckets[selectedBuckets.length - 1].endDateTime).getTime();
+    // Get all raw records within this time span
     const zoomedRecords = sortedHistory.filter(h => {
       const t = new Date(h.dateTime).getTime();
-      return t >= zoomRange[0] && t <= zoomRange[1];
+      return t >= rangeStart && t <= rangeEnd;
     });
-    // Expand slightly: include records from buckets that overlap the zoom range
-    if (zoomedRecords.length === 0) {
-      return allChartData.filter(d => d.timestamp >= zoomRange[0] && d.timestamp <= zoomRange[1]);
-    }
+    if (zoomedRecords.length === 0) return selectedBuckets;
     return buildBuckets(zoomedRecords);
   })();
 
