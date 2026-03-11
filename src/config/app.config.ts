@@ -18,18 +18,17 @@ export const HISTORY_FILTER_HOURS_OPTIONS = [
   { value: "3H", label: "3H" },
   { value: "6H", label: "6H" },
   { value: "12H", label: "12H" },
-  { value: "24H", label: "24H" },
-  { value: "48H", label: "48H" },
+  { value: "24H", label: "1D" },
+  { value: "48H", label: "2D" },
+  { value: "72H", label: "3D" },
+  { value: "96H", label: "4D" },
+  { value: "120H", label: "5D" },
 ] as const;
 
 // Record-count-based filter options (filter by last N records)
 export const HISTORY_FILTER_COUNT_OPTIONS = [
-  { value: 30, label: "30" },
-  { value: 90, label: "90" },
-  { value: 180, label: "180" },
-  { value: 400, label: "400" },
   { value: 1000, label: "1000" },
-  { value: 5000, label: "5000" },
+  { value: 2000, label: "2000" },
 ] as const;
 
 // Combined options (used for label lookups, etc.)
