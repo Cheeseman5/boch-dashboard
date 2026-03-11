@@ -533,8 +533,8 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
                   key={b.timestamp}
                   x={b.timestamp}
                   stroke="hsl(var(--border))"
-                  strokeWidth={1}
-                  strokeOpacity={b.isDay ? 0.75 : 0.5}
+                  strokeWidth={2}
+                  strokeOpacity={1}
                   strokeDasharray={b.isDay ? '4 2' : '2 3'}
                 />
               ))}
