@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   AreaChart,
   Area,
@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
+  ReferenceArea,
 } from 'recharts';
 import type { History, StoplightStatus } from '@/types/api';
 import { format } from 'date-fns';
