@@ -86,7 +86,10 @@ export const WatchCard = memo(function WatchCard({
     if (historyFilter === 'all') return history;
     if (isHourFilter(historyFilter)) {
       const hours = parseHourFilter(historyFilter);
-      const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+      // Use the most recent record's timestamp as reference instead of Date.now()
+      // This prevents the filter from becoming inaccurate as time passes since the last data fetch
+      const latestTime = Math.max(...history.map(h => new Date(h.dateTime).getTime()));
+      const cutoff = new Date(latestTime - hours * 60 * 60 * 1000);
       return history.filter(h => new Date(h.dateTime) >= cutoff);
     }
     // Sort by dateTime descending, take first N (most recent), then reverse for chronological order
