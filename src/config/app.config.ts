@@ -136,8 +136,8 @@ export const STOPLIGHT_THRESHOLDS = {
    * Example: redStatusCodes: [500, 502, 503] forces those codes to always show red.
    */
   redStatusCodes: [] as number[],
-  yellowStatusCodes: [429] as number[],
-  greenStatusCodes: [] as number[],
+  yellowStatusCodes: [] as number[],
+  greenStatusCodes: [429] as number[],
 } as const;
 
 // ============================================================================
