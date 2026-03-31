@@ -157,6 +157,20 @@ export const WatchCard = memo(function WatchCard({
       };
     }
     
+    // Use zoomed data if available (graph is zoomed in)
+    if (zoomedData && zoomedData.length > 0) {
+      const allTimes = zoomedData.flatMap(b => b.records.map(r => r.responseTimeMs));
+      if (allTimes.length === 0) {
+        return { count: 0, min: undefined, avg: undefined, max: undefined };
+      }
+      return {
+        count: allTimes.length,
+        min: Math.min(...allTimes),
+        avg: allTimes.reduce((a, b) => a + b, 0) / allTimes.length,
+        max: Math.max(...allTimes),
+      };
+    }
+
     // Use filtered dataset
     if (historyFilter === 'all' && summary) {
       return {
