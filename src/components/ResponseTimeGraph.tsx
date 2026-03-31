@@ -200,11 +200,13 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
 
   // Notify parent of visible data changes via effect (not during render)
   const isZoomed = zoomRange !== null;
+  // Track a stable key for chartData to trigger the effect when data changes
+  const chartDataKeyRef = useRef('');
   useEffect(() => {
     if (onVisibleDataChangeRef.current) {
-      onVisibleDataChangeRef.current(isZoomed ? chartDataRef.current : null);
+      onVisibleDataChangeRef.current(chartDataRef.current.length > 0 ? chartDataRef.current : null);
     }
-  }, [isZoomed, zoomRange]);
+  }, [isZoomed, zoomRange, chartDataKeyRef.current]);
 
   const handleMouseDown = useCallback((e: any) => {
     if (e?.activeLabel != null) {

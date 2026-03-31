@@ -157,21 +157,23 @@ export const WatchCard = memo(function WatchCard({
       };
     }
     
-    // Use zoomed data if available (graph is zoomed in)
+    // Use visible graph data (bucket-level) so min/max match the graph's Y-axis
     if (zoomedData && zoomedData.length > 0) {
+      const bucketValues = zoomedData.map(b => b.responseTimeMs);
       const allTimes = zoomedData.flatMap(b => b.records.map(r => r.responseTimeMs));
+      const totalCount = zoomedData.reduce((sum, b) => sum + b.count, 0);
       if (allTimes.length === 0) {
         return { count: 0, min: undefined, avg: undefined, max: undefined };
       }
       return {
-        count: allTimes.length,
-        min: Math.min(...allTimes),
+        count: totalCount,
+        min: Math.min(...bucketValues),
         avg: allTimes.reduce((a, b) => a + b, 0) / allTimes.length,
-        max: Math.max(...allTimes),
+        max: Math.max(...bucketValues),
       };
     }
 
-    // Use filtered dataset
+    // Fallback for filtered dataset when graph data not yet available
     if (historyFilter === 'all' && summary) {
       return {
         count: summary.histroyRecordCount,
