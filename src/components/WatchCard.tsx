@@ -330,10 +330,10 @@ export const WatchCard = memo(function WatchCard({
           {/* Metrics - stacked vertically (no Records, moved to header) */}
           <div className="flex flex-col justify-center gap-0.5 min-w-[70px]">
             <div>
-              <p className="text-[10px] text-muted-foreground leading-tight">Min</p>
+              <p className="text-[10px] text-muted-foreground leading-tight">Max</p>
               <p className="text-sm font-mono font-medium leading-tight flex justify-between">
                 {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : (
-                  <><span>{formatMs(metrics.min).value}</span><span className="text-muted-foreground ml-1">{formatMs(metrics.min).unit}</span></>
+                  <><span>{formatMs(metrics.max).value}</span><span className="text-muted-foreground ml-1">{formatMs(metrics.max).unit}</span></>
                 )}
               </p>
             </div>
@@ -346,10 +346,10 @@ export const WatchCard = memo(function WatchCard({
               </p>
             </div>
             <div>
-              <p className="text-[10px] text-muted-foreground leading-tight">Max</p>
+              <p className="text-[10px] text-muted-foreground leading-tight">Min</p>
               <p className="text-sm font-mono font-medium leading-tight flex justify-between">
                 {isLoading ? <span className="skeleton-pulse inline-block w-8 h-3" /> : (
-                  <><span>{formatMs(metrics.max).value}</span><span className="text-muted-foreground ml-1">{formatMs(metrics.max).unit}</span></>
+                  <><span>{formatMs(metrics.min).value}</span><span className="text-muted-foreground ml-1">{formatMs(metrics.min).unit}</span></>
                 )}
               </p>
             </div>
