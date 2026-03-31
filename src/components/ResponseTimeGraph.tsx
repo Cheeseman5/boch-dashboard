@@ -339,7 +339,8 @@ export function ResponseTimeGraph({ history, isLoading, highlightStatusCode, onD
     return buildBuckets(zoomedRecords);
   })();
   chartDataRef.current = chartData;
-
+  // Update key to trigger the visible-data effect when chart data changes
+  chartDataKeyRef.current = `${chartData.length}-${chartData[0]?.timestamp}-${chartData[chartData.length - 1]?.timestamp}`;
   // Calculate bounds
   const responseTimes = chartData.map((d) => d.responseTimeMs);
   const minResponse = Math.min(...responseTimes);
